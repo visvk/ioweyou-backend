@@ -29,63 +29,63 @@ exec = (next) ->
 
 
 dropMigrationTable = (next) ->
-  db.postgres.schema.dropTableIfExists('migration').then ()->
+  db.mysql.schema.dropTableIfExists('migration').then ()->
     grunt.verbose.oklns 'Migration table droped successfully.'
     next(null, true)
   , (error) ->
     grunt.verbose.errorlns error
 
 dropUserTable = (next) ->
-  db.postgres.schema.dropTableIfExists('user').then ()->
+  db.mysql.schema.dropTableIfExists('user').then ()->
     grunt.verbose.oklns 'User table droped successfully.'
     next(null, true)
   , (error) ->
     grunt.verbose.errorlns error
 
 dropUserClientTable = (next) ->
-  db.postgres.schema.dropTableIfExists('user_client').then ()->
+  db.mysql.schema.dropTableIfExists('user_client').then ()->
     grunt.verbose.oklns 'UserClient table droped successfully.'
     next(null, true)
   , (error) ->
     grunt.verbose.errorlns error
 
 dropUserFriendshipTable = (next) ->
-  db.postgres.schema.dropTableIfExists('user_friendship').then ()->
+  db.mysql.schema.dropTableIfExists('user_friendship').then ()->
     grunt.verbose.oklns 'UserFriendship table droped successfully.'
     next(null, true)
   , (error) ->
     grunt.verbose.errorlns error
 
 dropUserSocialTable = (next) ->
-  db.postgres.schema.dropTableIfExists('user_social').then ()->
+  db.mysql.schema.dropTableIfExists('user_social').then ()->
     grunt.verbose.oklns 'UserSocial table droped successfully.'
     next(null, true)
   , (error) ->
     grunt.verbose.errorlns error
 
 dropEntryTable = (next) ->
-  db.postgres.schema.dropTableIfExists('entry').then ()->
+  db.mysql.schema.dropTableIfExists('entry').then ()->
     grunt.verbose.oklns 'Entry table droped successfully.'
     next(null, true)
   , (error) ->
     grunt.verbose.errorlns error
 
 dropEntryCommentTable = (next) ->
-  db.postgres.schema.dropTableIfExists('entry_comment').then ()->
+  db.mysql.schema.dropTableIfExists('entry_comment').then ()->
     grunt.verbose.oklns 'EntryComment table droped successfully.'
     next(null, true)
   , (error) ->
     grunt.verbose.errorlns error
 
 dropAnnouncementTable = (next) ->
-  db.postgres.schema.dropTableIfExists('announcement').then ()->
+  db.mysql.schema.dropTableIfExists('announcement').then ()->
     grunt.verbose.oklns 'Announcement table droped successfully.'
     next(null, true)
   , (error) ->
     grunt.verbose.errorlns error
 
 dropAnnouncementConfirmationTable = (next) ->
-  db.postgres.schema.dropTableIfExists('announcement_confirmation').then ()->
+  db.mysql.schema.dropTableIfExists('announcement_confirmation').then ()->
     grunt.verbose.oklns 'AnnouncementConfirmation table droped successfully.'
     next(null, true)
   , (error) ->

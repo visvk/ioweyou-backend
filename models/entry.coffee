@@ -41,14 +41,14 @@ getEntryQuery = ()->
     .join('user as lender', 'lender.id', '=', 'entry.lender_id', 'left')
 
 create = (fields, next) ->
-  db.postgres('entry')
+  db.mysql('entry')
     .insert(fields)
     .returning('id')
     .exec (error, reply) ->
       next(error, reply)
 
 modify = (userId, entryId, fields, next) ->
-  db.postgres('entry')
+  db.mysql('entry')
     .update(fields)
     .where('id', '=', entryId)
     .where (sub) ->
@@ -81,7 +81,7 @@ getUserEntryById = (userId, entryId, next) ->
         next(null, reply[0])
 
 getNbOfEntriesWaitingForAcceptance = (userId, next) ->
-  db.postgres()
+  db.mysql()
     .from('entry')
     .count('id')
     .where('status', '=', 0)
@@ -93,7 +93,7 @@ getNbOfEntriesWaitingForAcceptance = (userId, next) ->
         next(null, reply[0])
 
 getCount = (userId, filters, next) ->
-  query = db.postgres()
+  query = db.mysql()
     .from('entry')
     .count('id')
     .where('status', '!=', 3)
@@ -155,7 +155,7 @@ getAll = (userId, filters, next) ->
     next(error, reply)
 
 getSummary = (userId, filters, next) ->
-  query = db.postgres()
+  query = db.mysql()
     .from('entry')
     .select('entry.value', 'entry.lender_id', 'entry.debtor_id')
     .where('entry.status', '=', '1')
@@ -196,7 +196,7 @@ getSummary = (userId, filters, next) ->
       next error, null
 
 accept = (userId, entryId, next) ->
-  db.postgres('entry')
+  db.mysql('entry')
     .update({'accepted_at': new Date(), 'status': 1})
     .where('id', '=', entryId)
     .whereIn('status', [0,2]) # open|rejected
@@ -205,7 +205,7 @@ accept = (userId, entryId, next) ->
       next(error, reply)
 
 reject = (userId, entryId, next) ->
-  db.postgres('entry')
+  db.mysql('entry')
     .update({'rejected_at': new Date(), 'status': 2})
     .where('id', '=', entryId)
     .where('status', '=', 0) # open
@@ -214,7 +214,7 @@ reject = (userId, entryId, next) ->
       next(error, reply)
 
 remove = (userId, entryId, next) ->
-  db.postgres('entry')
+  db.mysql('entry')
     .update({'status': 3})
     .where('id', '=', entryId)
     .where('status', '=', 0) # open

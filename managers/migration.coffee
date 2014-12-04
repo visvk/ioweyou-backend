@@ -11,9 +11,9 @@ module.exports =
 
 initialize = (next) ->
 
-  db.postgres.schema.hasTable('migration').then (exists)->
+  db.mysql.schema.hasTable('migration').then (exists)->
     if not exists
-      db.postgres.schema.createTable 'migration', (table)->
+      db.mysql.schema.createTable 'migration', (table)->
         table.bigIncrements('id')
         table.integer('version')
         table.timestamps()

@@ -8,7 +8,7 @@ module.exports =
 
 exec = (next) ->
     operations = [
-      createMigrationTable,
+     createMigrationTable,
       createUserTable,
       createUserClientTable,
       createUserFriendshipTable,
@@ -29,8 +29,8 @@ exec = (next) ->
 
 
 createMigrationTable = (next) ->
-  db.postgres.schema.createTable 'migration', (table)->
-    table.bigIncrements('id')
+  db.mysql.schema.createTable 'migration', (table)->
+    table.increments()
     table.integer('version')
     table.timestamps()
   .then () ->
@@ -42,8 +42,8 @@ createMigrationTable = (next) ->
 
 
 createUserTable = (next) ->
-  db.postgres.schema.createTable 'user', (table)->
-    table.bigIncrements('id')
+  db.mysql.schema.createTable 'user', (table)->
+    table.increments()
     table.string('password', 128).notNullable()
     table.string('username', 30).notNullable().unique().index()
     table.string('first_name', 30).notNullable()
@@ -60,8 +60,8 @@ createUserTable = (next) ->
 
 
 createUserClientTable = (next) ->
-  db.postgres.schema.createTable 'user_client', (table)->
-    table.bigIncrements('id')
+  db.mysql.schema.createTable 'user_client', (table)->
+    table.increments()
     table.string('name', 255).notNullable()
     table.string('token', 255)
     table.integer('user_id')
@@ -80,8 +80,8 @@ createUserClientTable = (next) ->
 
 
 createUserFriendshipTable = (next) ->
-  db.postgres.schema.createTable 'user_friendship', (table)->
-    table.bigIncrements('id')
+  db.mysql.schema.createTable 'user_friendship', (table)->
+    table.increments()
     table.integer('creator_id')
       .notNullable()
       .unsigned()
@@ -104,8 +104,8 @@ createUserFriendshipTable = (next) ->
 
 
 createUserSocialTable = (next) ->
-  db.postgres.schema.createTable 'user_social', (table)->
-    table.bigIncrements('id')
+  db.mysql.schema.createTable 'user_social', (table)->
+    table.increments()
     table.integer('user_id')
       .notNullable()
       .unsigned()
@@ -124,8 +124,8 @@ createUserSocialTable = (next) ->
 
 
 createEntryTable = (next) ->
-  db.postgres.schema.createTable 'entry', (table)->
-    table.bigIncrements('id')
+  db.mysql.schema.createTable 'entry', (table)->
+    table.increments()
     table.string('name', 255).notNullable()
     table.text('description')
     table.float('value', 6, 2)
@@ -135,13 +135,13 @@ createEntryTable = (next) ->
       .unsigned()
       .references('id')
       .inTable('user')
-      .onDelete("SET NULL")
+      .onDelete("CASCADE")
     table.integer('lender_id')
-      .notNullable()
+     .notNullable()
       .unsigned()
       .references('id')
       .inTable('user')
-      .onDelete("SET NULL")
+      .onDelete("CASCADE")
     table.timestamp('accepted_at')
     table.timestamp('rejected_at')
     table.timestamp('deleted_at')
@@ -155,15 +155,15 @@ createEntryTable = (next) ->
 
 
 createEntryCommentTable = (next) ->
-  db.postgres.schema.createTable 'entry_comment', (table)->
-    table.bigIncrements('id')
+  db.mysql.schema.createTable 'entry_comment', (table)->
+    table.increments()
     table.text('content')
     table.integer('user_id')
       .notNullable()
       .unsigned()
       .references('id')
       .inTable('user')
-      .onDelete("SET NULL")
+      .onDelete("CASCADE")
     table.integer('entry_id')
       .notNullable()
       .unsigned()
@@ -180,8 +180,8 @@ createEntryCommentTable = (next) ->
 
 
 createAnnouncementTable = (next) ->
-  db.postgres.schema.createTable 'announcement', (table)->
-    table.bigIncrements('id')
+  db.mysql.schema.createTable 'announcement', (table)->
+    table.increments()
     table.string('title', 255).notNullable()
     table.text('content').notNullable()
     table.timestamps()
@@ -193,8 +193,8 @@ createAnnouncementTable = (next) ->
     next(error)
 
 createAnnouncementConfirmationTable = (next) ->
-  db.postgres.schema.createTable 'announcement_confirmation', (table)->
-    table.bigIncrements('id')
+  db.mysql.schema.createTable 'announcement_confirmation', (table)->
+    table.increments()
     table.integer('announcement_id')
       .notNullable()
       .unsigned()

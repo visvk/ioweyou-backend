@@ -9,7 +9,7 @@ module.exports =
     createIfNotExists(userId, friendId, next)
 
 friendshipsExists = (userId, friendsIds, next) ->
-  db.postgres()
+  db.mysql()
     .from('user_friendship')
     .select(
       'id'
@@ -33,20 +33,20 @@ createIfNotExists = (userId, friendId, next) ->
     creator_id: userId
     friend_id: friendId
 
-  db.postgres('user_friendship')
+  db.mysql('user_friendship')
     .whereNotExists () ->
-      this.select(db.postgres.raw(1))
+      this.select(db.mysql.raw(1))
         .from('user_friendship')
         .where('creator_id', friendId)
         .andWhere('friend_id', userId)
     .whereNotExists () ->
-      this.select(db.postgres.raw(1))
+      this.select(db.mysql.raw(1))
         .from('user_friendship')
         .where('friend_id', friendId)
         .andWhere('creator_id', userId)
     .then (rows)->
       if rows.length > 0
-        db.postgres()
+        db.mysql()
           .insert(values)
           .into('user_friendship')
           .returning('id')

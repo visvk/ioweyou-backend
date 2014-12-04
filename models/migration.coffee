@@ -13,7 +13,7 @@ module.exports =
 
 create = (fields, next) ->
 
-  db.postgres('migration')
+  db.mysql('migration')
     .insert(fields)
     .exec (error, reply) ->
       next(error, reply)
@@ -21,7 +21,7 @@ create = (fields, next) ->
 
 modify = (fields, next) ->
 
-  db.postgres('migration')
+  db.mysql('migration')
     .update(fields)
     .where('id', '=', 1)
     .exec (error, reply) ->
@@ -30,7 +30,7 @@ modify = (fields, next) ->
 
 getVersion = (next) ->
 
-  db.postgres('migration')
+  db.mysql('migration')
     .select('version')
     .where('id', '=', 1)
     .exec (error, reply)->

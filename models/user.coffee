@@ -16,14 +16,14 @@ module.exports =
 
 
 create = (fields, next) ->
-  db.postgres('user')
+  db.mysql('user')
     .insert(fields)
     .returning('id')
     .exec next
 
 
 getBy = (fieldName, value, next) ->
-  db.postgres()
+  db.mysql()
     .from('user')
     .select(
       'user.id',
@@ -51,7 +51,7 @@ getByFacebookId = (value, next) ->
 
 
 findAllByFacebookIds = (facebookIds, next) ->
-  db.postgres()
+  db.mysql()
     .from('user')
     .select(
       'user.id',
@@ -67,7 +67,7 @@ findAllByFacebookIds = (facebookIds, next) ->
 
 
 getFriends = (id, next) ->
-  subQuery = db.postgres.raw('
+  subQuery = db.mysql.raw('
     SELECT uf.creator_id AS friend
     FROM user_friendship uf, "user" u
     WHERE u.id = uf.friend_id AND u.id = '+id+'
@@ -77,7 +77,7 @@ getFriends = (id, next) ->
     WHERE u.id = uf.creator_id AND u.id = '+id
   )
 
-  db.postgres()
+  db.mysql()
     .from('user')
     .select(
       'user.id',

@@ -3,7 +3,7 @@ config = require './config'
 http = require 'http'
 
 server = http.createServer(app)
-server.listen config.app.port, (error, result)->
+server.listen config.app.port, (error, result) ->
   if error
     console.info error
   else

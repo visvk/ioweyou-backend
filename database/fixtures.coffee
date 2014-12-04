@@ -25,7 +25,7 @@ load = (fileName, next) ->
     next()
 
 insertData = (fixture, next) ->
-  db.postgres(fixture.table)
+  db.mysql(fixture.table)
     .insert(fixture.data)
     .exec (error, reply) ->
       if error

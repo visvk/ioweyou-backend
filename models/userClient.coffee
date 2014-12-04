@@ -13,7 +13,7 @@ module.exports =
 
 
 getBy = (fieldName, value, next) ->
-  db.postgres()
+  db.mysql()
     .from('user_client AS uc')
     .select(
       'uc.id',
@@ -40,14 +40,14 @@ getByUserId = (userId, next) ->
 
 
 create = (fields, next) ->
-  db.postgres('user_client')
+  db.mysql('user_client')
     .insert(fields)
     .exec (error, reply) ->
       next(error, reply)
 
 
 modify = (id, fields, next) ->
-  db.postgres('user_client')
+  db.mysql('user_client')
     .update(fields)
     .where('id', '=', id)
     .exec (error, reply) ->

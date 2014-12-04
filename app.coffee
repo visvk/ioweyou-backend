@@ -23,8 +23,8 @@ require('./api/auth')(app)
 require('./api/user')(app)
 require('./api/userClient')(app)
 
-if config.apn.env in ["prod", "dev"]
-  apn = require('./lib/apn').apn
-  
-  #Events
-  require('./event/applePushNotificationsSubscriber')()
+#if config.apn.env in ["prod", "dev"]
+#  apn = require('./lib/apn').apn
+#
+#  #Events
+#  require('./event/applePushNotificationsSubscriber')()
