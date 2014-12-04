@@ -33,3 +33,6 @@ module.exports =
     expiration: '1d',
     reconnectDelay: '1s',
     cacheTTL: '30m'
+  logger:
+    console_log_level: 'debug'
+    file_log_level: 'WARN'

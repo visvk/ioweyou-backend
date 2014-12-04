@@ -2,15 +2,17 @@ express = require 'express'
 config = require './config'
 expressValidator = require 'express-validator'
 mailer = require 'express-mailer'
+bodyParser = require 'body-parser'
+morgan = require 'morgan'
 validator = require './lib/validator'
-
 
 app = exports.app = express()
 app.set('title', 'I Owe YOU!')
 app.set('views', __dirname + '/views')
 app.set('view engine', 'jade')
 
-app.use express.bodyParser()
+app.use morgan('dev')
+app.use bodyParser.json()
 app.use expressValidator({
   errorFormatter: validator.errorFormatter
 })

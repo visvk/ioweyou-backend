@@ -1,10 +1,15 @@
 app = require('./app').app
 config = require './config'
 http = require 'http'
+loggerManager = require './managers/loggerManager'
+loggerManager.setLogger()
 
-server = http.createServer(app)
-server.listen config.app.port, (error, result) ->
+logger = global.logger.profile 'server'
+
+http.globalAgent.maxSockets = 50
+
+app.listen config.app.port, (error, result) ->
   if error
-    console.info error
+    logger.info error
   else
-    console.info "Listening on port #{config.app.port}."
+    logger.info "Listening on port #{config.app.port}."

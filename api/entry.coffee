@@ -8,7 +8,8 @@ userManager = require '../managers/user'
 clientTable = require '../models/userClient'
 session = require '../models/session'
 emiter = require '../lib/eventEmiter'
-
+#
+#logger = global.logger.getLogger 'Entry Controller'
 
 module.exports = (app) ->
   app.get '/entries', auth.tokenAuth, filters, list
