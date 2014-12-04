@@ -41,6 +41,11 @@ Use the access_token in your API calls header: authorization: "Bearer access_tok
 
 ## My profile [/users/me]
 ### My profile [GET]
++ Request (application/json)
+    + Headers 
+
+            Authorization: Bearer 19f.3757754d6
+            
 + Response 200 (application/json)
 
         {
@@ -59,6 +64,10 @@ Use the access_token in your API calls header: authorization: "Bearer access_tok
     + filter%5Bwhere%5D%5Busername%5D%5Blike%5D (optional, string, `Joe`) ... get users where username like input
     
 ### List all Users [GET]
++ Request (application/json)
+    + Headers 
+
+            Authorization: Bearer 19f.3757754d6
 + Response 200 (application/json)
 
         {
@@ -75,8 +84,13 @@ Use the access_token in your API calls header: authorization: "Bearer access_tok
 
 ### Create a User [POST]
 + Request (application/json)
+    + Headers 
 
-        { "username": "Duh" }
+            Authorization: Bearer 19f.3757754d6
+            
+    + Body
+
+             { "username": "Duh" }
 
 + Response 201 (application/json)
 
@@ -89,6 +103,11 @@ A single User object with all its details
     + id (required, number, `1`) ... Numeric `id` of the User to perform action with. Has example value.
 
 ### Retrieve a User [GET]
++ Request (application/json)
+    + Headers 
+
+            Authorization: Bearer 19f.3757754d6
+            
 + Response 200 (application/json)
 
     + Body
@@ -113,6 +132,11 @@ A single User object with all its details
     + user_id (optional, int, `1`) ... get friend by user_id
     
 ### List all Friends [GET]
++ Request (application/json)
+    + Headers 
+
+            Authorization: Bearer 19f.3757754d6
+            
 + Response 200 (application/json)
 
         {
@@ -129,8 +153,12 @@ A single User object with all its details
 
 ### Add friend [POST]
 + Request (application/json)
+    + Headers 
 
-        { "user_id": "1" }
+            Authorization: Bearer 19f.3757754d6
+    + Body
+
+            { "user_id": "1" }
 
 + Response 201 (application/json)
 
@@ -150,6 +178,11 @@ A single User object with all its details
     + offset (optional, int, `0`)
     
 ### List all Depts [GET]
++ Request (application/json)
+    + Headers 
+
+            Authorization: Bearer 19f.3757754d6
+            
 + Response 200 (application/json)
 
         {
@@ -192,15 +225,20 @@ A single User object with all its details
 
 ### Add Dept [POST]
 + Request (application/json)
+    + Headers 
 
-        {
-            "borrower_id": "1", 
-            "borrower_name": "Joe Doe", 
-            "lender_id": "2", 
-            "lender_name": "Jolana Brocwan", 
-            "type_id": "1", 
-            "value": "10.50"
-        }
+            Authorization: Bearer 19f.3757754d6
+            
+    + Body
+
+            {
+                "borrower_id": "1", 
+                "borrower_name": "Joe Doe", 
+                "lender_id": "2", 
+                "lender_name": "Jolana Brocwan", 
+                "type_id": "1", 
+                "value": "10.50"
+            }
 
 + Response 201 (application/json)
 
@@ -223,6 +261,11 @@ A single Dept object with all its details
     + id (required, number, `1`) ... Numeric `id` of the Dept to perform action with. Has example value.
 
 ### Retrieve a Dept [GET]
++ Request (application/json)
+    + Headers 
+
+            Authorization: Bearer 19f.3757754d6
+            
 + Response 200 (application/json)
 
     + Body
@@ -245,10 +288,11 @@ A single Dept object with all its details
             }
  
 ### Refund a dept [PUT]
-+ Request (application/json)
 
-        {
-        }
++ Request (application/json)
+    + Headers 
+
+            Authorization: Bearer 19f.3757754d6
 
 + Response 200 (application/json)           
 
@@ -273,6 +317,11 @@ A single Dept object with all its details
 
 ## Types [/types]
 ### List all dept types [GET]
++ Request (application/json)
+    + Headers 
+
+            Authorization: Bearer 19f.3757754d6
+            
 + Response 200 (application/json)
 
         {
