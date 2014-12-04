@@ -3,4 +3,5 @@ config = require './config'
 redis = require 'redis'
 
 module.exports =
-	mysql: knex.initialize(config.database)
+  mysql: knex.initialize(config.database)
+  redis: redis.createClient()
