@@ -1,358 +1,292 @@
 FORMAT: 1A
-HOST: http://www.ioweyou.pl/api
 
-# I Owe YOU!
-Public API of ***I Owe YOU!*** application.
+# IoweYou
+This API is for developers who want to build functionality on top of I Owe You.
 
-# Group Auth
+# Responses
+- 200 OK - the request was successful.
+- 201 Created - the request was successful and a resource was created.
+- 400 Bad Request - resource was found, but wrong data structure was sent.
+- 401 Unauthorized - authentication failed or user doesn't have permissions for requested operation.
+- 404 Not Found - resource was not found.
 
-## Login [/login]  
-Method is used to retrieve user access token and details about them. Pass is a mandatory data. Its a facebook access token for *I Owe YOU!* application.
-### Action [POST]
-+ Request
+# Group Login
 
-    + Body
+## Login [/login]
+This resource is the first. Use it to log into the API.
+Use the access_token in your API calls header: authorization: "Bearer access_token"
 
-            {
-                pass: 'facebookApplicationToken'
-            }
-            
-+ Response 200 (application/json)
+### Login into the API [POST]
 
-        {
-            email: "jan.kowalski@example.com"
-            facebookId: "1234567890"
-            first_name: "Jan"
-            ioweyouId: "1"
-            ioweyouToken: "27652f01-175e-471a-96f8-eed64295b5be"
-            last_name: "Kowalski"
-            username: "jan.kowalski"
-        }
-            
-# Group Entry
-Entry related resources of the **Entry API**
-
-The Entry resource has the following attributes:
-
-- id
-- name
-- description
-- value
-- lender_id
-- accepted_at
-- created_at
-- updated_at
-- debtor_id
-- rejected_at
-- status
-- debtor_first_name
-- debtor_last_name
-- debtor_username
-- lender_first_name
-- lender_last_name
-- lender_username
-
-## Entries Collection [/entries{?contractor}{?from}{?to}{?limit}{?name}{?offset}{?status}]  
-
-### List [GET]
-+ Parameters
-    + contractor (optional, integer) ... user id
-    + from (optional, timestamp) ... date from
-    + limit (optional, integer) ... limit of entries to fetch
-    + name (optional, string) ... part of the name
-    + offset (optional, string) ... offset
-    + status (optional, string) ... status of entry
-    + to (optional, timestamp) ... date to
-    
-+ Request
-
-    + Headers
++ Request (application/json)
         
-            Authorization: 19f036e9-8ff3-4cff-895c-d763757754d6
-            
-+ Response 201 (application/json)
-
-        [
-            {
-                id: 1,
-                name: 'sample name',
-                description: 'sample description',
-                value: '5432.00',
-                lender_id: 1,
-                accepted_at: Wed Sep 18 2013 20:52:06 GMT+0200 (CEST),
-                created_at: Wed Aug 14 2013 20:09:48 GMT+0200 (CEST),
-                updated_at: Wed Oct 02 2013 20:26:57 GMT+0200 (CEST),
-                debtor_id: 2,
-                rejected_at: null,
-                status: 0,
-                debtor_first_name: 'DebtorFirstName',
-                debtor_last_name: 'DebtorLastName',
-                debtor_username: 'debtor',
-                lender_first_name: 'LenderFirstName',
-                lender_last_name: 'LenderLastName',
-                lender_username: 'lender'
-            }
-            {
-                id: 2,
-                name: 'sample name2',
-                description: 'sample description2',
-                value: '10.00',
-                lender_id: 1,
-                accepted_at: Wed Sep 18 2013 00:02:17 GMT+0200 (CEST),
-                created_at: Sun Oct 10 2010 10:00:00 GMT+0200 (CEST),
-                updated_at: Sun Oct 10 2010 10:00:01 GMT+0200 (CEST),
-                debtor_id: 2,
-                rejected_at: null,
-                status: 0,
-                debtor_first_name: 'DebtorFirstName',
-                debtor_last_name: 'DebtorLastName',
-                debtor_username: 'debtor',
-                lender_first_name: 'LenderFirstName',
-                lender_last_name: 'LenderLastName',
-                lender_username: 'lender'
-            }
-        ]
-   
-### Create [POST]
-
-+ Request
-
-    + Headers
-        
-            Authorization: 19f036e9-8ff3-4cff-895c-d763757754d6
-    
     + Body
     
+            { "username": "Joe", "password": "Doe" }
+        
++ Response 200 (application/json)
+    + Headers 
+
+            Cache-Control: no-store
+            Pragma: no-cache
+        
+    + Body
+        
             {
-                "name": 'sample name', 
-                "description": 'sample description',
-                "value": '5432.00', 
-                "includeMe" 1,
-                "contractors": [1, 2, 4]
+              "access_token":"2YotnFZFEjr1zCsicMWpAA",
+              "token_type":"bearer"
             }
-            
-+ Response 201 (application/json)
-
-        {
-            "isCreated": 1
-        }
         
-## Entries Summary [/entries/summary{?contractor}{?from}{?to}{?limit}{?name}{?offset}{?status}]  
-+ Parameters
-    + contractor (optional, integer) ... user id
-    + from (optional, timestamp) ... date from
-    + limit (optional, integer) ... limit of entries to fetch
-    + name (optional, string) ... part of the name
-    + offset (optional, string) ... offset
-    + status (optional, string) ... status of entry
-    + to (optional, timestamp) ... date to
-    
-### Retrieve [GET]
-+ Request
+# Group Users
 
-    + Headers
-        
-            Authorization: 19f036e9-8ff3-4cff-895c-d763757754d6
-            
+## My profile [/users/me]
+### My profile [GET]
 + Response 200 (application/json)
 
         {
-            "summary": 12312, 
+        "status": "success",
+        "users":
+            [{
+              "id": "1", "username": "Joe Doe"
+            }]
         }
-
-## Entries Count [/entries/count{?contractor}{?from}{?to}{?limit}{?name}{?offset}{?status}]  
-+ Parameters
-    + contractor (optional, integer) ... user id
-    + from (optional, timestamp) ... date from
-    + limit (optional, integer) ... limit of entries to fetch
-    + name (optional, string) ... part of the name
-    + offset (optional, string) ... offset
-    + status (optional, string) ... status of entry
-    + to (optional, timestamp) ... date to
-    
-### Retrieve [GET]
-+ Request
-
-    + Headers
         
-            Authorization: 19f036e9-8ff3-4cff-895c-d763757754d6
-            
+## Users [/users{?username,limit,offset,filter%5Bwhere%5D%5Busername%5D%5Blike%5D}]
++ Parameters
+    + username (optional, string, `Joe Doe`) ... get user by username
+    + limit (optional, int, `10`)  ... **default**: 10
+    + offset (optional, int, `0`)
+    + filter%5Bwhere%5D%5Busername%5D%5Blike%5D (optional, string, `Joe`) ... get users where username like input
+    
+### List all Users [GET]
 + Response 200 (application/json)
 
         {
-            "aggregate": 12312, 
+        "status": "success",
+        "users":
+            [{
+              "id": "1", "username": "Joe Doe"
+            }, {
+              "id": "2", "username": "Jolana Brocwan"
+            }]
         }
 
-## Entry [/entry/{id}]
+## Users [/users]
 
-+ Parameters
-
-    + id (integer) ... ID of the Entry.
-    
-### Retrieve [GET]
-+ Request
-
-    + Headers
-        
-            Authorization: 19f036e9-8ff3-4cff-895c-d763757754d6
-            
-+ Response 200 (application/json)
-
-        {
-            "id": 1, 
-            "name": 'sample name', 
-            "description": 'sample description',
-            "value": '5432.00', 
-            "lender_id": 1, 
-            "accepted_at": Wed Sep 18 2013 20:52:06 GMT+0200 (CEST),
-            "created_at": Wed Aug 14 2013 20:09:48 GMT+0200 (CEST),
-            "updated_at": Wed Oct 02 2013 20:26:57 GMT+0200 (CEST),
-            "debtor_id": 2,
-            "rejected_at": null,
-            "status": 0, 
-            "debtor_first_name": 'DebtorFirstName',
-            "debtor_last_name": 'DebtorLastName',
-            "debtor_username": 'debtor',
-            "lender_first_name": 'LenderFirstName',
-            "lender_last_name": 'LenderLastName',
-            "lender_username": 'lender'
-        }
-
-### Modify [PATCH]
+### Create a User [POST]
 + Request (application/json)
 
-    + Headers
-        
-            Authorization: 19f036e9-8ff3-4cff-895c-d763757754d6
-            
+        { "username": "Duh" }
+
++ Response 201 (application/json)
+
+        { "id": 3, "username": "Duh" }
+
+## User [/users/{id}]
+A single User object with all its details
+
++ Parameters
+    + id (required, number, `1`) ... Numeric `id` of the User to perform action with. Has example value.
+
+### Retrieve a User [GET]
++ Response 200 (application/json)
+
     + Body
-    
+
             { 
-                "description": "Lorem ipsum...",
-                "name": "Lorem ipsum...",
-                "value": "1234.56"
+            "status" : "success",
+            "users" : [ 
+                { 
+                "id" : "3",
+                "username" : "Duh"
+                } 
+            ]
             }
-        
-            
+
+### Remove a User [DELETE]
++ Response 204
+
+# Group Friends
+
+## Friends [/friends{?user_id}]
++ Parameters
+    + user_id (optional, int, `1`) ... get friend by user_id
+    
+### List all Friends [GET]
 + Response 200 (application/json)
 
         {
-            "isModified": 1
+        "status": "success",
+        "friends":
+            [{
+              "id": "1", "user_id": "1", "username": "Joe Doe"
+            }, {
+              "id": "2", "user_id": "2", "username": "Jolana Brocwan"
+            }]
         }
-        
-        
-### Delete [DELETE]
-+ Request
 
-    + Headers
+## Friends [/friends]
+
+### Add friend [POST]
++ Request (application/json)
+
+        { "user_id": "1" }
+
++ Response 201 (application/json)
+
+        {"status": "success"}
         
-            Authorization: 19f036e9-8ff3-4cff-895c-d763757754d6
-        
-            
+# Group Depts
+
+## Depts [/depts{?borrower_id,borrower_name,lender_id,lender_name,type_id,refunded,limit,offset}]
++ Parameters
+    + borrower_id (optional, int, `1`) ... get depts by borrower_id
+    + borrower_name (optional, string, `Joe Doe`) ... get depts by borrower_name
+    + lender_id (optional, int, `2`) ... get depts by lender_id
+    + lender_name (optional, string, `Jolana Brocwan`) ... get depts by lender_name
+    + type_id (optional, int, `1`) ... get depts by type_id
+    + refunded (optional, boolean, `false`) ... get depts by refund, when false, dept is not refunded, **default**: false
+    + limit (optional, int, `10`) ... **default**: 10
+    + offset (optional, int, `0`)
+    
+### List all Depts [GET]
 + Response 200 (application/json)
 
         {
-          "isModified": 1
+        "status": "success",
+        "depts":
+            [{
+              "id": "1", 
+              "borrower_id": "1", 
+              "borrower_name": "Joe Doe", 
+              "lender_id": "2", 
+              "lender_name": "Jolana Brocwan", 
+              "type_id": "1", 
+              "value": "10.50",
+              "refunded": null,
+              "created": "2014-11-27T22:48:27Z"
+            }, {
+              "id": "2", 
+              "borrower_id": "2", 
+              "borrower_name": "Jolana Brocwan", 
+              "lender_id": null, 
+              "lender_name": "Boris Jelcin", 
+              "type_id": "1", 
+              "value": "5.50",
+              "refunded": null,
+              "created": "2014-11-27T22:48:27Z"
+            }, {
+              "id": "3", 
+              "borrower_id": null, 
+              "borrower_name": "Chuck Norris", 
+              "lender_id": "2", 
+              "lender_name": "Jolana Brocwan", 
+              "type_id": "2", 
+              "value": "1",
+              "refunded": "2014-11-27T23:48:27Z",
+              "created": "2014-11-27T22:48:27Z"
+            }]
         }
-      
-      
-## Entry Accept [/entry/accept/{id}]
-### Action [POST]
-+ Request
+        
+## Depts [/depts]
 
-    + Headers
-        
-            Authorization: 19f036e9-8ff3-4cff-895c-d763757754d6
-        
+### Add Dept [POST]
++ Request (application/json)
+
+        {
+            "borrower_id": "1", 
+            "borrower_name": "Joe Doe", 
+            "lender_id": "2", 
+            "lender_name": "Jolana Brocwan", 
+            "type_id": "1", 
+            "value": "10.50"
+        }
+
++ Response 201 (application/json)
+
+            {
+              "id": "1", 
+              "borrower_id": "1", 
+              "borrower_name": "Joe Doe", 
+              "lender_id": "2", 
+              "lender_name": "Jolana Brocwan", 
+              "type_id": "1", 
+              "value": "10.50",
+              "refunded": null,
+              "created": "2014-11-27T22:48:27Z"
+            }
             
+## Dept [/depts/{id}]
+A single Dept object with all its details
+
++ Parameters
+    + id (required, number, `1`) ... Numeric `id` of the Dept to perform action with. Has example value.
+
+### Retrieve a Dept [GET]
++ Response 200 (application/json)
+
+    + Body
+
+            { 
+            "status" : "success",
+            "users" : [ 
+                {
+                  "id": "1", 
+                  "borrower_id": "1", 
+                  "borrower_name": "Joe Doe", 
+                  "lender_id": "2", 
+                  "lender_name": "Jolana Brocwan", 
+                  "type_id": "1", 
+                  "value": "10.50",
+                  "refunded": null,
+                  "created": "2014-11-27T22:48:27Z"
+             } 
+             ]
+            }
+ 
+### Refund a dept [PUT]
++ Request (application/json)
+
+        {
+        }
+
++ Response 200 (application/json)           
+
+            { 
+            "status" : "success",
+            "users" : [ 
+                {
+                  "id": "1", 
+                  "borrower_id": "1", 
+                  "borrower_name": "Joe Doe", 
+                  "lender_id": "2", 
+                  "lender_name": "Jolana Brocwan", 
+                  "type_id": "1", 
+                  "value": "10.50",
+                  "refunded": "2014-11-27T23:48:27Z",
+                  "created": "2014-11-27T22:48:27Z"
+             } 
+             ]
+            }
+
+# Group Dept Types
+
+## Types [/types]
+### List all dept types [GET]
 + Response 200 (application/json)
 
         {
-          "isModified": 1
+        "status": "success",
+        "types":
+            [{
+              "id": "1", 
+              "name": "money"
+            }, {
+              "id": "2", 
+              "name": "coffee"
+            }, {
+              "id": "3", 
+              "name": "beer"
+            }]
         }
 
-## Entry Reject [/entry/reject/{id}]
-### Action [POST]
-+ Request
-
-    + Headers
-        
-            Authorization: 19f036e9-8ff3-4cff-895c-d763757754d6
-        
-            
-+ Response 200 (application/json)
-
-        {
-          "isModified": 1
-        }
-        
-# Group User
-
-## Friends [/user/friends]  
-
-### Retrieve list of user that has relationship to [GET]
-+ Request
-
-    + Headers
-        
-            Authorization: 19f036e9-8ff3-4cff-895c-d763757754d6
-            
-+ Response 200 (application/json)
-
-        [
-          {
-            "id": 1,
-            "username": "janusz.kowalski",
-            "first_name": "Janusz",
-            "last_name": "Kowalski",
-            "email": "janusz.kowalski@example.com",
-            "uid": "1234567890"
-          },
-          {
-            "id": 2,
-            "username": "mariolka.kowalska",
-            "first_name": "Mariolka",
-            "last_name": "Kowalska",
-            "email": "mariolka.kowalska@example.com",
-            "uid": "1234567891"
-          },
-          {
-            "id": 3,
-            "username": "zbychu.kowalski",
-            "first_name": "Zbychu",
-            "last_name": "Kowalski",
-            "email": "zbychu.kowalski@example.com",
-            "uid": "1234567892"
-          },
-          
-          {
-            "id": 4,
-            "username": "eustachy.kowalski",
-            "first_name": "Eustachy",
-            "last_name": "Kowalski",
-            "email": "eustachy.kowalski@example.com",
-            "uid": "1234567893"
-          },
-        ]
-        
-        
-## User [/user/{id}]  
-
-### Retrieve single user [GET]
-+ Request
-
-    + Headers
-        
-            Authorization: 19f036e9-8ff3-4cff-895c-d763757754d6
-            
-
-+ Response 200 (application/json)
-
-          {
-            "id": 1,
-            "username": "janusz.kowalski",
-            "first_name": "Janusz",
-            "last_name": "Kowalski",
-            "email": "janusz.kowalski@example.com",
-            "uid": "1234567890"
-          },
