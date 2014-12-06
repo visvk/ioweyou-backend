@@ -10,16 +10,17 @@ db = require '../db'
 session = require '../models/session'
 moment = require 'moment'
 _ = require 'lodash'
+logger = require './../lib/logger'
 
 module.exports = (app) ->
   app.post '/login',
     validateRequest,
     prepareLocals,
-    fetchIfUserAcceptAppFromFacebook,
-    fetchUserDataFromFacebook,
-    checkIfUserExists,
-    register,
-    fetchFriendsFromFacebook,
+#    fetchIfUserAcceptAppFromFacebook,
+#    fetchUserDataFromFacebook,
+#    checkIfUserExists,
+#    register,
+#    fetchFriendsFromFacebook,
     login
 
 prepareLocals = (req, res, next) ->
@@ -42,24 +43,34 @@ validateRequest = (req, res, next) ->
       next()
 
 login = (req, res) ->
-  if res.locals.existingUser
-    user = res.locals.existingUser
+  userTokens =
+    access_token: "2YotnFZFEjr1zCsicMWpAA"
+    token_type: "bearer"
 
-    loggedUser =
-      username: user.username
-      first_name: user.first_name
-      last_name: user.last_name
-      email: user.email
-      facebookId: res.locals.facebookUser.id
-      ioweyouToken: uuid.v4()
-      ioweyouId: user.id.toString()
+  res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate')
+  res.header('Expires', '-1')
+  res.header('Pragma', 'no-cache')
+  res.status 200
+  res.send userTokens
 
-    req.session.setUserData loggedUser.ioweyouToken, loggedUser
-    res.header "Content-Type", "application/json"
-    res.status 200
-    res.send loggedUser
-  else
-    res.status(500).send('Login error occured.')
+#  if res.locals.existingUser
+#    user = res.locals.existingUser
+#
+#    loggedUser =
+#      username: user.username
+#      first_name: user.first_name
+#      last_name: user.last_name
+#      email: user.email
+#      facebookId: res.locals.facebookUser.id
+#      ioweyouToken: uuid.v4()
+#      ioweyouId: user.id.toString()
+#
+##    req.session.setUserData loggedUser.ioweyouToken, loggedUser
+#    res.header "Content-Type", "application/json"
+#    res.status 200
+#    res.send loggedUser
+#  else
+#    res.status(500).send('Login error occured.')
 
 register = (req, res, next) ->
   if not res.locals.existingUser
@@ -100,25 +111,25 @@ register = (req, res, next) ->
   else
     next()
 
-fetchIfUserAcceptAppFromFacebook = (req, res, next) ->
-  request.get facebook.getGraphAPI.AppRequest(res.locals.facebookToken), (error, response, appResponseBody) ->
-    if not error && response.statusCode == 200
-      appResponseObject = JSON.parse(appResponseBody)
-
-      if appResponseObject.id is config.facebook.appId
-        next()
-      else
-        res.status(403).send('Forbidden')
-    else
-      res.status(500).send('Facebook Server Error')
-
-fetchUserDataFromFacebook = (req, res, next) ->
-  request.get facebook.getGraphAPI.MeRequest(res.locals.facebookToken), (error, response, meResponseBody) ->
-    if not error && response.statusCode == 200
-      res.locals.facebookUser = JSON.parse(meResponseBody)
-      next()
-    else
-      res.status(500).send('Facebook Server Error')
+#fetchIfUserAcceptAppFromFacebook = (req, res, next) ->
+#  request.get facebook.getGraphAPI.AppRequest(res.locals.facebookToken), (error, response, appResponseBody) ->
+#    if not error && response.statusCode == 200
+#      appResponseObject = JSON.parse(appResponseBody)
+#
+#      if appResponseObject.id is config.facebook.appId
+#        next()
+#      else
+#        res.status(403).send('Forbidden')
+#    else
+#      res.status(500).send('Facebook Server Error')
+#
+#fetchUserDataFromFacebook = (req, res, next) ->
+#  request.get facebook.getGraphAPI.MeRequest(res.locals.facebookToken), (error, response, meResponseBody) ->
+#    if not error && response.statusCode == 200
+#      res.locals.facebookUser = JSON.parse(meResponseBody)
+#      next()
+#    else
+#      res.status(500).send('Facebook Server Error')
 
 checkIfUserExists = (req, res, next) ->
   userTable.getByFacebookId res.locals.facebookUser.id, (user)->

@@ -11,7 +11,6 @@ module.exports = (grunt) ->
           mocha: require('mocha')
         src: ['test/**/*_test.coffee']
 
-
   grunt.registerTask 'migration:init', 'Initialize migration system.', ()->
     done = this.async()
     migration.initialize (message) ->

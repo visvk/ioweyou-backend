@@ -1,10 +1,7 @@
 app = require('./app').app
 config = require './config'
 http = require 'http'
-loggerManager = require './managers/loggerManager'
-loggerManager.setLogger()
-
-logger = global.logger.profile 'server'
+logger = require './lib/logger'
 
 http.globalAgent.maxSockets = 50
 

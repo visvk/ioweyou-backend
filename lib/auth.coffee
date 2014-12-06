@@ -2,6 +2,7 @@ express = require 'express'
 request = require 'request'
 session = require '../models/session'
 config = require '../config'
+#logger = global.logger.profile 'server'
 
 module.exports =
   tokenAuth: (req, res, next) ->
@@ -21,4 +22,5 @@ tokenAuth = (req, res, next) ->
       else
         res.status(403).send 'Forbidden'
   else
+
     res.status(401).send 'Unauthorized'

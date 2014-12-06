@@ -2,7 +2,7 @@
   "name": "ioweyou",
   "description": "I Owe YOU! Backend",
   "version": "0.0.1",
-  "private": true,
+  "private": false,
   "dependencies": {
     "apnagent": "*",
     "async": "^0.2.5",
@@ -28,6 +28,7 @@
     "q": "*",
     "redis": "*",
     "request": "*",
+    "supertest": "^0.15.0",
     "winston": "^0.8.3"
   }
 }

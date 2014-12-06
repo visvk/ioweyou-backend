@@ -5,18 +5,18 @@ mailer = require 'express-mailer'
 bodyParser = require 'body-parser'
 morgan = require 'morgan'
 validator = require './lib/validator'
+logger = require './lib/logger'
 
 app = exports.app = express()
 app.set('title', 'I Owe YOU!')
 app.set('views', __dirname + '/views')
 app.set('view engine', 'jade')
 
-app.use morgan('dev')
+app.use morgan('dev', { "stream": logger.stream })
 app.use bodyParser.json()
 app.use expressValidator({
   errorFormatter: validator.errorFormatter
 })
-
 mailer.extend app, config.mailer
 
 #Controllers

@@ -6,3 +6,4 @@ dump.rdb
 certificates/*
 device.coffee
 test-reports.xml
+/logs/*.log*
