@@ -4,8 +4,8 @@ moment = require 'moment'
 module.exports =
   getById: (id, next) ->
     getById(id, next)
-  getUserEntryById: (userId, entryId, next) ->
-    getUserEntryById(userId, entryId, next)
+  getUserDebtById: (userId, debtId, next) ->
+    getUserDebtById(userId, debtId, next)
   getAll: (userId, filters, next) ->
     getAll(userId, filters, next)
   getSummary: (userId, filters, next) ->
@@ -16,63 +16,59 @@ module.exports =
     getNbOfEntriesWaitingForAcceptance(userId, next)
   create: (fields, next) ->
     create(fields, next)
-  modify: (userId, entryId, fields, next) ->
-    modify(userId, entryId, fields, next)
-  accept: (userId, entryId, next) ->
-    accept(userId, entryId, next)
-  reject: (userId, entryId, next) ->
-    reject(userId, entryId, next)
-  remove: (userId, entryId, next) ->
-    remove(userId, entryId, next)
+  modify: (userId, debtId, fields, next) ->
+    modify(userId, debtId, fields, next)
+  accept: (userId, debtId, next) ->
+    accept(userId, debtId, next)
+  reject: (userId, debtId, next) ->
+    reject(userId, debtId, next)
+  remove: (userId, debtId, next) ->
+    remove(userId, debtId, next)
 
-getEntryQuery = ()->
+getDebtQuery = ()->
   db.postgres()
-  .from('entry')
+  .from('debt')
   .select(
-    'entry.*',
-    'debtor.first_name as debtor_first_name',
-    'debtor.last_name as debtor_last_name',
-    'debtor.username as debtor_username',
-    'lender.first_name as lender_first_name',
-    'lender.last_name as lender_last_name',
+    'debt.*',
+    'borrower.username as borrower_username',
     'lender.username as lender_username'
   )
-  .join('user as debtor', 'debtor.id', '=', 'entry.debtor_id', 'left')
-  .join('user as lender', 'lender.id', '=', 'entry.lender_id', 'left')
+  .join('user as borrower', 'borrower.id', '=', 'debt.borrower_id', 'left')
+  .join('user as lender', 'lender.id', '=', 'debt.lender_id', 'left')
 
 create = (fields, next) ->
-  db.postgres('entry')
+  db.postgres('debt')
   .insert(fields)
   .returning('id')
   .exec (error, reply) ->
     next(error, reply)
 
-modify = (userId, entryId, fields, next) ->
-  db.postgres('entry')
+modify = (userId, debtId, fields, next) ->
+  db.postgres('debt')
   .update(fields)
-  .where('id', '=', entryId)
+  .where('id', '=', debtId)
   .where (sub) ->
-    sub.where('debtor_id', userId)
+    sub.where('borrower_id', userId)
     .orWhere('lender_id', userId)
   .exec (error, reply) ->
     next(error, reply)
 
 getById = (id, next) ->
-  getEntryQuery()
-  .where('entry.id', id)
-  .where('entry.status', '<', '3')
+  getDebtQuery()
+  .where('debt.id', id)
+  .where('debt.status', '<', '3')
   .exec (error, reply) ->
     if error
       next(error, null)
     else
       next(null, reply[0])
 
-getUserEntryById = (userId, entryId, next) ->
-  getEntryQuery()
-  .where('entry.id', entryId)
-  .where('entry.status', '<', '3')
+getUserDebtById = (userId, debtId, next) ->
+  getDebtQuery()
+  .where('debt.id', debtId)
+  .where('debt.status', '<', '3')
   .where (sub) ->
-    sub.where('debtor.id', userId)
+    sub.where('borrower.id', userId)
     .orWhere('lender.id', userId)
   .exec (error, reply) ->
     if error
@@ -82,10 +78,10 @@ getUserEntryById = (userId, entryId, next) ->
 
 getNbOfEntriesWaitingForAcceptance = (userId, next) ->
   db.postgres()
-  .from('entry')
+  .from('debt')
   .count('id')
   .where('status', '=', 0)
-  .where('debtor_id', '=', userId)
+  .where('borrower_id', '=', userId)
   .exec (error, reply) ->
     if error
       next(error, null)
@@ -94,11 +90,11 @@ getNbOfEntriesWaitingForAcceptance = (userId, next) ->
 
 getCount = (userId, filters, next) ->
   query = db.postgres()
-  .from('entry')
+  .from('debt')
   .count('id')
   .where('status', '!=', 3)
   .where (sub) ->
-    sub.where('debtor_id', userId)
+    sub.where('borrower_id', userId)
     .orWhere('lender_id', userId)
 
   if filters.from
@@ -109,7 +105,7 @@ getCount = (userId, filters, next) ->
 
   if filters.contractor
     query.where (sub) ->
-      sub.where('debtor_id', filters.contractor)
+      sub.where('borrower_id', filters.contractor)
       .orWhere('lender_id', filters.contractor)
 
   if filters.status?
@@ -125,9 +121,9 @@ getCount = (userId, filters, next) ->
       next(null, reply[0])
 
 getAll = (userId, filters, next) ->
-  query = getEntryQuery()
+  query = getDebtQuery()
   .where (sub) ->
-    sub.where('debtor_id', userId)
+    sub.where('borrower_id', userId)
     .orWhere('lender_id', userId)
   .where('status', '!=', 3)
   .limit(filters.limit or 8)
@@ -135,14 +131,14 @@ getAll = (userId, filters, next) ->
   .orderBy('created_at', filters.order or 'desc')
 
   if filters.from
-    query.where('entry.created_at', '>',  moment(filters.from).toISOString())
+    query.where('debt.created_at', '>',  moment(filters.from).toISOString())
 
   if filters.to
-    query.where('entry.created_at', '<', moment(filters.to).toISOString())
+    query.where('debt.created_at', '<', moment(filters.to).toISOString())
 
   if filters.contractor
     query.where (sub) ->
-      sub.where('debtor_id', filters.contractor)
+      sub.where('borrower_id', filters.contractor)
       .orWhere('lender_id', filters.contractor)
 
   if filters.status?
@@ -156,11 +152,11 @@ getAll = (userId, filters, next) ->
 
 getSummary = (userId, filters, next) ->
   query = db.postgres()
-  .from('entry')
-  .select('entry.value', 'entry.lender_id', 'entry.debtor_id')
-  .where('entry.status', '=', '1')
+  .from('debt')
+  .select('debt.value', 'debt.lender_id', 'debt.borrower_id')
+  .where('debt.status', '=', '1')
   .where (sub) ->
-    sub.where('debtor_id', userId)
+    sub.where('borrower_id', userId)
     .orWhere('lender_id', userId)
 
   if filters.from
@@ -171,7 +167,7 @@ getSummary = (userId, filters, next) ->
 
   if filters.contractor
     query.where (sub) ->
-      sub.where('debtor_id', filters.contractor)
+      sub.where('borrower_id', filters.contractor)
       .orWhere('lender_id', filters.contractor)
 
   if filters.status?
@@ -185,7 +181,7 @@ getSummary = (userId, filters, next) ->
       summary = 0.0
       i = 0
       for row in reply
-        if row.debtor_id is Number(userId)
+        if row.borrower_id is Number(userId)
           summary = parseFloat(summary) - parseFloat(row.value)
         if row.lender_id is Number(userId)
           summary = parseFloat(summary) + parseFloat(row.value)
@@ -195,28 +191,28 @@ getSummary = (userId, filters, next) ->
     else
       next error, null
 
-accept = (userId, entryId, next) ->
-  db.postgres('entry')
+accept = (userId, debtId, next) ->
+  db.postgres('debt')
   .update({'accepted_at': new Date(), 'status': 1})
-  .where('id', '=', entryId)
+  .where('id', '=', debtId)
   .whereIn('status', [0,2]) # open|rejected
-  .where('debtor_id', '=', userId)
+  .where('borrower_id', '=', userId)
   .exec (error, reply) ->
     next(error, reply)
 
-reject = (userId, entryId, next) ->
-  db.postgres('entry')
+reject = (userId, debtId, next) ->
+  db.postgres('debt')
   .update({'rejected_at': new Date(), 'status': 2})
-  .where('id', '=', entryId)
+  .where('id', '=', debtId)
   .where('status', '=', 0) # open
-  .where('debtor_id', '=', userId)
+  .where('borrower_id', '=', userId)
   .exec (error, reply) ->
     next(error, reply)
 
-remove = (userId, entryId, next) ->
-  db.postgres('entry')
+remove = (userId, debtId, next) ->
+  db.postgres('debt')
   .update({'status': 3})
-  .where('id', '=', entryId)
+  .where('id', '=', debtId)
   .where('status', '=', 0) # open
   .where('lender_id', '=', userId)
   .exec (error, reply) ->

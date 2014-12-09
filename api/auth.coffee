@@ -3,7 +3,7 @@ request = require 'request'
 auth = require '../lib/auth'
 facebook = require '../lib/facebook'
 userTable = require '../models/user'
-userSocialTable = require '../models/userSocial'
+#userSocialTable = require '../models/userSocial'
 userFriendshipTable = require '../models/userFriendship'
 config = require '../config'
 db = require '../db'
@@ -35,12 +35,13 @@ prepareLocals = (req, res, next) ->
   next()
 
 validateRequest = (req, res, next) ->
-    req.assert('pass', 'Passcode required.').notEmpty()
+  req.checkBody('username', 'Username Required.').notEmpty()
+  req.checkBody('password', 'Password required').notEmpty()
 
-    if req.validationErrors()
-      res.status(400).send()
-    else
-      next()
+  if req.validationErrors()
+    res.status(400).send()
+  else
+    next()
 
 login = (req, res) ->
   userTokens =
@@ -131,35 +132,35 @@ register = (req, res, next) ->
 #    else
 #      res.status(500).send('Facebook Server Error')
 
-checkIfUserExists = (req, res, next) ->
-  userTable.getByFacebookId res.locals.facebookUser.id, (user)->
-    if user
-      res.locals.existingUser = user
-
-    next()
-
-
-fetchFriendsFromFacebook = (req, res, next) ->
-  if res.locals.newlyRegisteredUser
-    request.get facebook.getGraphAPI.FriendsRequest(res.locals.facebookToken, res.locals.facebookUser.id), (error, response, friendsResponseBody) ->
-      if not error && response.statusCode == 200
-        fetchedFriends = JSON.parse(friendsResponseBody)
-
-        installedFriends = _.filter fetchedFriends.data, (friend) ->
-          return friend.installed is true
-
-        friendsIds = _.map installedFriends, (friend) ->
-          return friend.id
-
-        userTable.findAllByFacebookIds friendsIds, (error, users) ->
-
-          _.forEach users, (user) ->
-            userFriendshipTable.createIfNotExists res.locals.existingUser.id, user.id, (error, reply) ->
-              if error
-                console.log error
-
-        next()
-      else
-        res.status(500).send('Facebook Server Error')
-  else
-    next()
+#checkIfUserExists = (req, res, next) ->
+#  userTable.getByFacebookId res.locals.facebookUser.id, (user)->
+#    if user
+#      res.locals.existingUser = user
+#
+#    next()
+#
+#
+#fetchFriendsFromFacebook = (req, res, next) ->
+#  if res.locals.newlyRegisteredUser
+#    request.get facebook.getGraphAPI.FriendsRequest(res.locals.facebookToken, res.locals.facebookUser.id), (error, response, friendsResponseBody) ->
+#      if not error && response.statusCode == 200
+#        fetchedFriends = JSON.parse(friendsResponseBody)
+#
+#        installedFriends = _.filter fetchedFriends.data, (friend) ->
+#          return friend.installed is true
+#
+#        friendsIds = _.map installedFriends, (friend) ->
+#          return friend.id
+#
+#        userTable.findAllByFacebookIds friendsIds, (error, users) ->
+#
+#          _.forEach users, (user) ->
+#            userFriendshipTable.createIfNotExists res.locals.existingUser.id, user.id, (error, reply) ->
+#              if error
+#                console.log error
+#
+#        next()
+#      else
+#        res.status(500).send('Facebook Server Error')
+#  else
+#    next()

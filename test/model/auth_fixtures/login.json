@@ -1,0 +1,14 @@
+[
+    {
+        "table": "user",
+        "data": {
+            "id": 1,
+            "password": "!",
+            "username": "joe",
+            "first_name": "user1",
+            "last_name": "user1",
+            "email": "user1@gmail.com",
+            "is_active": true
+        }
+    }
+]

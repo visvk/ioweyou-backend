@@ -24,15 +24,15 @@
         }
     },
     {
-        "table": "entry",
+        "table": "debt",
         "data": {
             "id": 1,
-            "name": "entry#1",
+            "name": "debt#1",
             "description": "-",
             "value": 10,
             "status": 1,
             "lender_id": 1,
-            "debtor_id": 2,
+            "borrower_id": 2,
             "accepted_at": "1999-01-01 10:10:10",
             "rejected_at": "1999-01-01 10:10:10",
             "created_at": "1999-01-01 10:10:10",
@@ -40,15 +40,15 @@
         }
     },
     {
-        "table": "entry",
+        "table": "debt",
         "data": {
             "id": 2,
-            "name": "entry#2",
+            "name": "debt#2",
             "description": "-",
             "value": 10,
             "status": 1,
             "lender_id": 2,
-            "debtor_id": 1,
+            "borrower_id": 1,
             "accepted_at": "1999-01-01 10:10:10",
             "rejected_at": "1999-01-01 10:10:10",
             "created_at": "1999-01-01 10:10:10",
@@ -56,15 +56,15 @@
         }
     },
     {
-        "table": "entry",
+        "table": "debt",
         "data": {
             "id": 3,
-            "name": "entry#3",
+            "name": "debt#3",
             "description": "-",
             "value": 10,
             "status": 3,
             "lender_id": 1,
-            "debtor_id": 2,
+            "borrower_id": 2,
             "accepted_at": "1999-01-01 10:10:10",
             "rejected_at": "1999-01-01 10:10:10",
             "created_at": "1999-01-01 10:10:10",

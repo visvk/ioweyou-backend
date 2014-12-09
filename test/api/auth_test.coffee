@@ -19,9 +19,10 @@ describe 'api/auth', ->
   it "should return code 400, when POST \"/login\" route without credentials", (done)->
     request(url)
       .post('/login')
-      .set('Authorization', "Basic asdasd456")
+      .set('Authorization', "Basic llll")
 #      .expect('Content-Type', /json/)
       .expect(400)
       .end (err,res) ->
+        console.log res.body
         if err then throw err
         done()

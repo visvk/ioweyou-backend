@@ -7,12 +7,12 @@ module.exports =
     getById(id, next)
   getBy: (fieldName, value, next) ->
     getBy(fieldName, value, next)
-  getByFacebookId: (value, next) ->
-    getByFacebookId(value, next)
+#  getByFacebookId: (value, next) ->
+#    getByFacebookId(value, next)
   getFriends: (userId, next) ->
     getFriends(userId, next)
-  findAllByFacebookIds: (facebookIds, next) ->
-    findAllByFacebookIds(facebookIds, next)
+#  findAllByFacebookIds: (facebookIds, next) ->
+#    findAllByFacebookIds(facebookIds, next)
 
 
 create = (fields, next) ->
@@ -27,13 +27,8 @@ getBy = (fieldName, value, next) ->
   .from('user')
   .select(
     'user.id',
-    'user.username',
-    'user.first_name',
-    'user.last_name',
-    'user.email',
-    'sau.uid'
+    'user.username'
   )
-  .join('user_social as sau', 'sau.user_id', '=', 'user.id', 'left')
   .where(fieldName, value)
   .exec (error, reply) ->
     if not error
@@ -45,27 +40,7 @@ getBy = (fieldName, value, next) ->
 getById = (id, next) ->
   getBy('user.id', id, next)
 
-
-getByFacebookId = (value, next) ->
-  getBy('sau.uid', value, next)
-
-
-findAllByFacebookIds = (facebookIds, next) ->
-  db.postgres()
-  .from('user')
-  .select(
-    'user.id',
-    'user.username',
-    'user.first_name',
-    'user.last_name',
-    'user.email',
-    'sau.uid'
-  )
-  .join('user_social as sau', 'sau.user_id', '=', 'user.id', 'left')
-  .whereIn('sau.uid', facebookIds)
-  .exec next
-
-
+# TODO: Escape id
 getFriends = (id, next) ->
   subQuery = db.postgres.raw('
     SELECT uf.creator_id AS friend
@@ -81,15 +56,10 @@ getFriends = (id, next) ->
   .from('user')
   .select(
     'user.id',
-    'user.username',
-    'user.first_name',
-    'user.last_name',
-    'user.email',
-    'sau.uid'
+    'user.username'
   )
   .whereIn('user.id', subQuery)
-  .join('user_social as sau', 'sau.user_id', '=', 'user.id', 'left')
-  .orderBy('user.last_name', 'ASC')
+  .orderBy('user.username', 'ASC')
   .exec (error, reply) ->
     if not error
       next(reply)

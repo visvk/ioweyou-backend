@@ -1,27 +1,27 @@
 moment = require 'moment'
 config = require '../config'
 auth = require '../lib/auth'
-entryTable = require '../models/entry'
+debtsTable = require '../models/debt'
 userTable = require '../models/user'
 userFriendshipTable = require '../models/userFriendship'
 userManager = require '../managers/user'
-clientTable = require '../models/userClient'
+#clientTable = require '../models/userClient'
 session = require '../models/session'
 emiter = require '../lib/eventEmiter'
 #
-#logger = global.logger.getLogger 'Entry Controller'
+logger = require './../lib/logger'
 
 module.exports = (app) ->
-  app.get '/entries', auth.tokenAuth, filters, list
-  app.get '/entries/summary', auth.tokenAuth, filters, summary
-  app.get '/entries/count', auth.tokenAuth, filters, count
-  app.post '/entries',auth.tokenAuth, create
+  app.get '/debts', auth.tokenAuth, filters, list
+#  app.get '/debts/summary', auth.tokenAuth, filters, summary
+#  app.get '/debts/count', auth.tokenAuth, filters, count
+#  app.post '/debts',auth.tokenAuth, create
 
-  app.get '/entry/:id', auth.tokenAuth, one
-  app.patch '/entry/:id', auth.tokenAuth, modify
-  app.post '/entry/accept/:id', auth.tokenAuth, accept
-  app.post '/entry/reject/:id', auth.tokenAuth, reject
-  app.delete '/entry/:id', auth.tokenAuth, remove
+  app.get '/debts/:id', auth.tokenAuth, one
+#  app.patch '/debts/:id', auth.tokenAuth, modify
+#  app.post '/debts/accept/:id', auth.tokenAuth, accept
+#  app.post '/debts/reject/:id', auth.tokenAuth, reject
+#  app.delete '/debts/:id', auth.tokenAuth, remove
 
 
 filters = (req, res, next) ->
@@ -68,20 +68,22 @@ filters = (req, res, next) ->
     next()
 
 one = (req, res) ->
-  req.assert('id', 'Invalid entry ID').notEmpty().isInt()
+  req.assert('id', 'Invalid debts ID').notEmpty().isInt()
 
   if req.validationErrors()
+    logger.warn "Debt validation Error: ", req.validationErrors()
     res.status(400).send()
   else
-    entryId = req.params.id
+    debtsId = req.params.id
     userId = res.locals.user.ioweyouId
 
-    entryTable.getUserEntryById userId, entryId, (error, entry) ->
+    debtsTable.getUserEntryById userId, debtsId, (error, debts) ->
       res.header "Content-Type", "application/json"
       if error
+        logger.warn "Debt one error: ", error
         res.status(500).send()
-      else if entry
-        res.send entry
+      else if debts
+        res.send debts
       else
         res.status(404).send()
 
@@ -89,12 +91,13 @@ one = (req, res) ->
 list = (req, res) ->
   userId = res.locals.user.ioweyouId
 
-  entryTable.getAll userId, res.locals.filters, (error, entries) ->
+  debtsTable.getAll userId, res.locals.filters, (error, debts) ->
     res.header "Content-Type", "application/json"
     if error
+      logger.warn "Debt List Error: ", error
       res.status(500).send {error: 'Internal Server Error.'}
-    else if entries
-      res.send entries
+    else if debts
+      res.send debts
     else
       res.status(404).send {error: "Not Found."}
 
@@ -102,7 +105,7 @@ list = (req, res) ->
 summary = (req, res) ->
   userId = res.locals.user.ioweyouId
 
-  entryTable.getSummary userId, res.locals.filters, (error, summary) ->
+  debtsTable.getSummary userId, res.locals.filters, (error, summary) ->
     res.header "Content-Type", "application/json"
     if error
       res.status(500).send({error: 'Internal Server Error.'})
@@ -115,7 +118,7 @@ summary = (req, res) ->
 count = (req, res) ->
   userId = res.locals.user.ioweyouId
 
-  entryTable.getCount userId, res.locals.filters, (error, count) ->
+  debtsTable.getCount userId, res.locals.filters, (error, count) ->
     res.header "Content-Type", "application/json"
     if error
       res.status(500).send("Internal Server Error.")
@@ -156,7 +159,7 @@ create = (req, res) ->
                   created_at: moment().format('YYYY-MM-DD HH:mm:ss')
                   updated_at: moment().format('YYYY-MM-DD HH:mm:ss')
 
-                entryTable.create values, (error, entry)->
+                debtsTable.create values, (error, debts)->
                   if error
                     res.status(404).send()
                   else
@@ -165,9 +168,9 @@ create = (req, res) ->
                     event =
                       subject: subject
                       userId: dbContractor.id
-                      entryId: entry
+                      debtsId: debts
 
-                    emiter.emit 'entryCreation', event
+                    emiter.emit 'debtsCreation', event
 
                     res.mailer.send 'mails/creatingConfirmation', {
                       to: dbContractor.email,
@@ -192,30 +195,30 @@ accept = (req, res) ->
   if req.validationErrors()
     res.status(400).send()
   else
-    entryId = req.params.id
+    debtsId = req.params.id
     userId = res.locals.user.ioweyouId
 
-    entryTable.accept userId, entryId, (error, isModified) ->
+    debtsTable.accept userId, debtsId, (error, isModified) ->
       if isModified
-        entryTable.getById entryId, (error, entry)->
+        debtsTable.getById debtsId, (error, debts)->
           if error
             res.status(400).send()
           else
-            userTable.getById entry.lender_id, (lender)->
-              userTable.getById entry.debtor_id, (debtor)->
-                subject = "#{debtor.first_name} #{debtor.last_name} accepted your entry."
+            userTable.getById debts.lender_id, (lender)->
+              userTable.getById debts.debtor_id, (debtor)->
+                subject = "#{debtor.first_name} #{debtor.last_name} accepted your debts."
 
                 event =
                   subject: subject
                   userId: lender.id
-                  entryId: entryId
+                  debtsId: debtsId
 
-                emiter.emit 'entryAcceptance', event
+                emiter.emit 'debtsAcceptance', event
 
                 res.mailer.send 'mails/acceptance', {
                   to: lender.email,
                   subject: subject,
-                  entry: entry,
+                  debts: debts,
                   debtor: debtor
                 }, (error) ->
       if error
@@ -230,28 +233,28 @@ reject = (req, res) ->
   if req.validationErrors()
     res.status(400).send()
   else
-    entryId = req.params.id
+    debtsId = req.params.id
     userId = res.locals.user.ioweyouId
 
-    entryTable.reject userId, entryId, (error, isModified) ->
+    debtsTable.reject userId, debtsId, (error, isModified) ->
       if isModified
-        entryTable.getById entryId, (error, entry)->
-          userTable.getById entry.lender_id, (lender)->
-            userTable.getById entry.debtor_id, (debtor)->
+        debtsTable.getById debtsId, (error, debts)->
+          userTable.getById debts.lender_id, (lender)->
+            userTable.getById debts.debtor_id, (debtor)->
 
-              subject = "#{debtor.first_name} #{debtor.last_name} rejected your entry."
+              subject = "#{debtor.first_name} #{debtor.last_name} rejected your debts."
 
               event =
                 subject: subject
                 userId: lender.id
-                entryId: entryId
+                debtsId: debtsId
 
-              emiter.emit 'entryRejection', event
+              emiter.emit 'debtsRejection', event
 
               res.mailer.send 'mails/rejection', {
                 to: lender.email,
                 subject: subject,
-                entry: entry,
+                debts: debts,
                 debtor: debtor
                 }, (error) ->
 
@@ -267,10 +270,10 @@ remove = (req, res) ->
   if req.validationErrors()
     res.status(400).send(req.validationErrors())
   else
-    entryId = req.params.id
+    debtsId = req.params.id
     userId = res.locals.user.ioweyouId
 
-    entryTable.remove userId, entryId, (error, isModified) ->
+    debtsTable.remove userId, debtsId, (error, isModified) ->
       res.header "Content-Type", "application/json"
       if error
         res.status(500).send()
@@ -288,7 +291,7 @@ modify = (req, res) ->
   if req.validationErrors()
     res.status(400).send(req.validationErrors())
   else
-    entryId = req.params.id
+    debtsId = req.params.id
     userId = res.locals.user.ioweyouId
     name = req.body.name
     description = req.body.description
@@ -300,28 +303,28 @@ modify = (req, res) ->
       value: value
       updated_at: moment().format('YYYY-MM-DD HH:mm:ss')
 
-    entryTable.modify userId, entryId, values, (error, isModified) ->
+    debtsTable.modify userId, debtsId, values, (error, isModified) ->
       if isModified
-        entryTable.getById entryId, (error, entry)->
+        debtsTable.getById debtsId, (error, debts)->
           if error
             res.status(400).send()
           else
-            userTable.getById entry.lender_id, (lender)->
-              userTable.getById entry.debtor_id, (debtor)->
+            userTable.getById debts.lender_id, (lender)->
+              userTable.getById debts.debtor_id, (debtor)->
 
-                subject = "#{lender.first_name} #{lender.last_name} modified entry."
+                subject = "#{lender.first_name} #{lender.last_name} modified debts."
 
                 event =
                   subject: subject
                   userId: debtor.id
-                  entryId: entryId
+                  debtsId: debtsId
 
-                emiter.emit 'entryRejection', event
+                emiter.emit 'debtsRejection', event
 
                 res.mailer.send 'mails/modification', {
                   to: debtor.email,
                   subject: subject,
-                  entry: entry,
+                  debts: debts,
                   lender: lender
                   }, (error) ->
 

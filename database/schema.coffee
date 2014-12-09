@@ -10,13 +10,9 @@ exec = (next) ->
   operations = [
     createMigrationTable,
     createUserTable,
-    createUserClientTable,
     createUserFriendshipTable,
-    createUserSocialTable,
-    createEntryTable,
-    createEntryCommentTable,
-    createAnnouncementTable,
-    createAnnouncementConfirmationTable
+    createDeptTypeTable,
+    createDeptTable
   ]
 
   async.series operations, (error, result) ->
@@ -46,9 +42,10 @@ createUserTable = (next) ->
     table.bigIncrements('id')
     table.string('password', 128).notNullable()
     table.string('username', 30).notNullable().unique().index()
-    table.string('first_name', 30).notNullable()
-    table.string('last_name', 30).notNullable()
-    table.string('email', 75).notNullable().index()
+    table.string('first_name', 30)
+    table.string('last_name', 30)
+    table.string('email', 75).index()
+    table.string('token', 255)
     table.boolean('is_active').defaultTo(true)
     table.timestamps()
   .then () ->
@@ -57,27 +54,6 @@ createUserTable = (next) ->
   , (error) ->
     grunt.verbose.errorlns 'User table was not created, error occurred.'
     next(error)
-
-
-createUserClientTable = (next) ->
-  db.postgres.schema.createTable 'user_client', (table)->
-    table.bigIncrements('id')
-    table.string('name', 255).notNullable()
-    table.string('token', 255)
-    table.integer('user_id')
-    .notNullable()
-    .unsigned()
-    .references('id')
-    .inTable('user')
-    .onDelete("CASCADE")
-    table.timestamps()
-  .then ()->
-    grunt.verbose.oklns 'UserClient table created successfully.'
-    next(null, true)
-  , (error) ->
-    grunt.verbose.errorlns 'UserClient table was not created, error occurred.'
-    next(error)
-
 
 createUserFriendshipTable = (next) ->
   db.postgres.schema.createTable 'user_friendship', (table)->
@@ -102,74 +78,10 @@ createUserFriendshipTable = (next) ->
     grunt.verbose.errorlns 'UserFriendship table was not created, error occurred.'
     next(error)
 
-
-createUserSocialTable = (next) ->
-  db.postgres.schema.createTable 'user_social', (table)->
-    table.bigIncrements('id')
-    table.integer('user_id')
-    .notNullable()
-    .unsigned()
-    .references('id')
-    .inTable('user')
-    .onDelete("CASCADE")
-    table.string('provider', 64).notNullable()
-    table.string('uid', 255).notNullable()
-    table.text('extra_data').notNullable()
-  .then ()->
-    grunt.verbose.oklns 'UserSocial table created successfully.'
-    next(null, true)
-  , (error) ->
-    grunt.verbose.errorlns 'UserSocial table was not created, error occurred.'
-    next(error)
-
-
-createEntryTable = (next) ->
-  db.postgres.schema.createTable 'entry', (table)->
+createDeptTypeTable = (next) ->
+  db.postgres.schema.createTable 'dept_type', (table)->
     table.bigIncrements('id')
     table.string('name', 255).notNullable()
-    table.text('description')
-    table.float('value', 6, 2)
-    table.tinyInteger('status')
-    table.integer('debtor_id')
-    .notNullable()
-    .unsigned()
-    .references('id')
-    .inTable('user')
-    .onDelete("SET NULL")
-    table.integer('lender_id')
-    .notNullable()
-    .unsigned()
-    .references('id')
-    .inTable('user')
-    .onDelete("SET NULL")
-    table.timestamp('accepted_at')
-    table.timestamp('rejected_at')
-    table.timestamp('deleted_at')
-    table.timestamps()
-  .then ()->
-    grunt.verbose.oklns 'Entry table created successfully'
-    next(null, true)
-  , (error) ->
-    grunt.verbose.errorlns 'Entry table was not created, error occurred.'
-    next(error)
-
-
-createEntryCommentTable = (next) ->
-  db.postgres.schema.createTable 'entry_comment', (table)->
-    table.bigIncrements('id')
-    table.text('content')
-    table.integer('user_id')
-    .notNullable()
-    .unsigned()
-    .references('id')
-    .inTable('user')
-    .onDelete("SET NULL")
-    table.integer('entry_id')
-    .notNullable()
-    .unsigned()
-    .references('id')
-    .inTable('entry')
-    .onDelete("CASCADE")
     table.timestamps()
   .then ()->
     grunt.verbose.oklns 'EntryComment table created successfully'
@@ -178,33 +90,39 @@ createEntryCommentTable = (next) ->
     grunt.verbose.errorlns 'EntryComment table was not created, error occurred.'
     next(error)
 
-
-createAnnouncementTable = (next) ->
-  db.postgres.schema.createTable 'announcement', (table)->
+createDeptTable = (next) ->
+  db.postgres.schema.createTable 'debt', (table)->
     table.bigIncrements('id')
-    table.string('title', 255).notNullable()
-    table.text('content').notNullable()
-    table.timestamps()
-  .then ()->
-    grunt.verbose.oklns 'Announcement table created successfully'
-    next(null, true)
-  , (error) ->
-    grunt.verbose.errorlns 'Announcement table was not created, error occurred.'
-    next(error)
-
-createAnnouncementConfirmationTable = (next) ->
-  db.postgres.schema.createTable 'announcement_confirmation', (table)->
-    table.bigIncrements('id')
-    table.integer('announcement_id')
+    table.string('name', 255).notNullable()
+    table.float('value', 6, 2)
+    table.tinyInteger('status')
+    table.integer('borrower_id')
     .notNullable()
     .unsigned()
     .references('id')
-    .inTable('announcement')
-    .onDelete("CASCADE")
-    table.timestamp('created_at')
+    .inTable('user')
+    .onDelete("SET NULL")
+    table.string('borrower_name', 255)
+    table.integer('lender_id')
+    .notNullable()
+    .unsigned()
+    .references('id')
+    .inTable('user')
+    .onDelete("SET NULL")
+    table.integer('dept_type_id')
+    .notNullable()
+    .unsigned()
+    .references('id')
+    .inTable('dept_type')
+    .onDelete("SET NULL")
+    table.string('lender_name', 255)
+    table.timestamp('accepted_at')
+    table.timestamp('rejected_at')
+    table.timestamp('deleted_at')
+    table.timestamps()
   .then ()->
-    grunt.verbose.oklns 'AnnouncementConfirmation table created successfully'
+    grunt.verbose.oklns 'debt table created successfully'
     next(null, true)
   , (error) ->
-    grunt.verbose.errorlns 'AnnouncementConfirmation table was not created, error occurred.'
+    grunt.verbose.errorlns 'debt table was not created, error occurred.'
     next(error)

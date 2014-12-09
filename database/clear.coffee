@@ -8,13 +8,9 @@ module.exports =
 
 exec = (next) ->
   operations = [
-    dropUserClientTable,
     dropUserFriendshipTable,
-    dropUserSocialTable,
-    dropEntryCommentTable,
-    dropAnnouncementConfirmationTable
-    dropAnnouncementTable,
-    dropEntryTable,
+    dropDebtTable,
+    dropDeptTypeTable,
     dropUserTable,
     dropMigrationTable,
   ]
@@ -42,13 +38,6 @@ dropUserTable = (next) ->
   , (error) ->
     grunt.verbose.errorlns error
 
-dropUserClientTable = (next) ->
-  db.postgres.schema.dropTableIfExists('user_client').then ()->
-    grunt.verbose.oklns 'UserClient table droped successfully.'
-    next(null, true)
-  , (error) ->
-    grunt.verbose.errorlns error
-
 dropUserFriendshipTable = (next) ->
   db.postgres.schema.dropTableIfExists('user_friendship').then ()->
     grunt.verbose.oklns 'UserFriendship table droped successfully.'
@@ -56,37 +45,16 @@ dropUserFriendshipTable = (next) ->
   , (error) ->
     grunt.verbose.errorlns error
 
-dropUserSocialTable = (next) ->
-  db.postgres.schema.dropTableIfExists('user_social').then ()->
-    grunt.verbose.oklns 'UserSocial table droped successfully.'
+dropDebtTable = (next) ->
+  db.postgres.schema.dropTableIfExists('debt').then ()->
+    grunt.verbose.oklns 'Debt table droped successfully.'
     next(null, true)
   , (error) ->
     grunt.verbose.errorlns error
 
-dropEntryTable = (next) ->
-  db.postgres.schema.dropTableIfExists('entry').then ()->
-    grunt.verbose.oklns 'Entry table droped successfully.'
-    next(null, true)
-  , (error) ->
-    grunt.verbose.errorlns error
-
-dropEntryCommentTable = (next) ->
-  db.postgres.schema.dropTableIfExists('entry_comment').then ()->
-    grunt.verbose.oklns 'EntryComment table droped successfully.'
-    next(null, true)
-  , (error) ->
-    grunt.verbose.errorlns error
-
-dropAnnouncementTable = (next) ->
-  db.postgres.schema.dropTableIfExists('announcement').then ()->
-    grunt.verbose.oklns 'Announcement table droped successfully.'
-    next(null, true)
-  , (error) ->
-    grunt.verbose.errorlns error
-
-dropAnnouncementConfirmationTable = (next) ->
-  db.postgres.schema.dropTableIfExists('announcement_confirmation').then ()->
-    grunt.verbose.oklns 'AnnouncementConfirmation table droped successfully.'
+dropDeptTypeTable = (next) ->
+  db.postgres.schema.dropTableIfExists('dept_type').then ()->
+    grunt.verbose.oklns 'dept_type table droped successfully.'
     next(null, true)
   , (error) ->
     grunt.verbose.errorlns error
