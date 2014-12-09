@@ -13,30 +13,29 @@ module.exports =
 
 create = (fields, next) ->
 
-  db.mysql('migration')
-    .insert(fields)
-    .exec (error, reply) ->
-      next(error, reply)
+  db.postgres('migration')
+  .insert(fields)
+  .exec (error, reply) ->
+    next(error, reply)
 
 
 modify = (fields, next) ->
 
-  db.mysql('migration')
-    .update(fields)
-    .where('id', '=', 1)
-    .exec (error, reply) ->
-      next(error, reply)
+  db.postgres('migration')
+  .update(fields)
+  .where('id', '=', 1)
+  .exec (error, reply) ->
+    next(error, reply)
 
 
 getVersion = (next) ->
 
-  db.mysql('migration')
-    .select('version')
-    .where('id', '=', 1)
-    .exec (error, reply)->
-      if not error
-        next(reply[0]['version'])
-      else
-        next(null)
-
+  db.postgres('migration')
+  .select('version')
+  .where('id', '=', 1)
+  .exec (error, reply)->
+    if not error
+      next(reply[0]['version'])
+    else
+      next(null)
 

@@ -5,7 +5,7 @@ module.exports =
     create(fields, next)
 
 create = (fields, next) ->
-  db.mysql('user_social')
+  db.postgres('user_social')
     .insert(fields)
     .returning('id')
     .exec next

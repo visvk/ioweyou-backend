@@ -27,79 +27,79 @@ module.exports =
 
 getEntryQuery = ()->
   db.postgres()
-    .from('entry')
-    .select(
-      'entry.*',
-      'debtor.first_name as debtor_first_name',
-      'debtor.last_name as debtor_last_name',
-      'debtor.username as debtor_username',
-      'lender.first_name as lender_first_name',
-      'lender.last_name as lender_last_name',
-      'lender.username as lender_username'
-    )
-    .join('user as debtor', 'debtor.id', '=', 'entry.debtor_id', 'left')
-    .join('user as lender', 'lender.id', '=', 'entry.lender_id', 'left')
+  .from('entry')
+  .select(
+    'entry.*',
+    'debtor.first_name as debtor_first_name',
+    'debtor.last_name as debtor_last_name',
+    'debtor.username as debtor_username',
+    'lender.first_name as lender_first_name',
+    'lender.last_name as lender_last_name',
+    'lender.username as lender_username'
+  )
+  .join('user as debtor', 'debtor.id', '=', 'entry.debtor_id', 'left')
+  .join('user as lender', 'lender.id', '=', 'entry.lender_id', 'left')
 
 create = (fields, next) ->
-  db.mysql('entry')
-    .insert(fields)
-    .returning('id')
-    .exec (error, reply) ->
-      next(error, reply)
+  db.postgres('entry')
+  .insert(fields)
+  .returning('id')
+  .exec (error, reply) ->
+    next(error, reply)
 
 modify = (userId, entryId, fields, next) ->
-  db.mysql('entry')
-    .update(fields)
-    .where('id', '=', entryId)
-    .where (sub) ->
-      sub.where('debtor_id', userId)
-        .orWhere('lender_id', userId)
-    .exec (error, reply) ->
-      next(error, reply)
+  db.postgres('entry')
+  .update(fields)
+  .where('id', '=', entryId)
+  .where (sub) ->
+    sub.where('debtor_id', userId)
+    .orWhere('lender_id', userId)
+  .exec (error, reply) ->
+    next(error, reply)
 
 getById = (id, next) ->
   getEntryQuery()
-    .where('entry.id', id)
-    .where('entry.status', '<', '3')
-    .exec (error, reply) ->
-      if error
-        next(error, null)
-      else
-        next(null, reply[0])
+  .where('entry.id', id)
+  .where('entry.status', '<', '3')
+  .exec (error, reply) ->
+    if error
+      next(error, null)
+    else
+      next(null, reply[0])
 
 getUserEntryById = (userId, entryId, next) ->
   getEntryQuery()
-    .where('entry.id', entryId)
-    .where('entry.status', '<', '3')
-    .where (sub) ->
-      sub.where('debtor.id', userId)
-      .orWhere('lender.id', userId)
-    .exec (error, reply) ->
-      if error
-        next(error, null)
-      else
-        next(null, reply[0])
+  .where('entry.id', entryId)
+  .where('entry.status', '<', '3')
+  .where (sub) ->
+    sub.where('debtor.id', userId)
+    .orWhere('lender.id', userId)
+  .exec (error, reply) ->
+    if error
+      next(error, null)
+    else
+      next(null, reply[0])
 
 getNbOfEntriesWaitingForAcceptance = (userId, next) ->
-  db.mysql()
-    .from('entry')
-    .count('id')
-    .where('status', '=', 0)
-    .where('debtor_id', '=', userId)
-    .exec (error, reply) ->
-      if error
-        next(error, null)
-      else
-        next(null, reply[0])
+  db.postgres()
+  .from('entry')
+  .count('id')
+  .where('status', '=', 0)
+  .where('debtor_id', '=', userId)
+  .exec (error, reply) ->
+    if error
+      next(error, null)
+    else
+      next(null, reply[0])
 
 getCount = (userId, filters, next) ->
-  query = db.mysql()
-    .from('entry')
-    .count('id')
-    .where('status', '!=', 3)
-    .where (sub) ->
-      sub.where('debtor_id', userId)
-        .orWhere('lender_id', userId)
+  query = db.postgres()
+  .from('entry')
+  .count('id')
+  .where('status', '!=', 3)
+  .where (sub) ->
+    sub.where('debtor_id', userId)
+    .orWhere('lender_id', userId)
 
   if filters.from
     query.where('created_at', '>',  moment(filters.from).toISOString())
@@ -110,7 +110,7 @@ getCount = (userId, filters, next) ->
   if filters.contractor
     query.where (sub) ->
       sub.where('debtor_id', filters.contractor)
-        .orWhere('lender_id', filters.contractor)
+      .orWhere('lender_id', filters.contractor)
 
   if filters.status?
     query.where('status', '=', filters.status)
@@ -126,13 +126,13 @@ getCount = (userId, filters, next) ->
 
 getAll = (userId, filters, next) ->
   query = getEntryQuery()
-    .where (sub) ->
-      sub.where('debtor_id', userId)
-        .orWhere('lender_id', userId)
-    .where('status', '!=', 3)
-    .limit(filters.limit or 8)
-    .offset(filters.offset or 0)
-    .orderBy('created_at', filters.order or 'desc')
+  .where (sub) ->
+    sub.where('debtor_id', userId)
+    .orWhere('lender_id', userId)
+  .where('status', '!=', 3)
+  .limit(filters.limit or 8)
+  .offset(filters.offset or 0)
+  .orderBy('created_at', filters.order or 'desc')
 
   if filters.from
     query.where('entry.created_at', '>',  moment(filters.from).toISOString())
@@ -143,7 +143,7 @@ getAll = (userId, filters, next) ->
   if filters.contractor
     query.where (sub) ->
       sub.where('debtor_id', filters.contractor)
-        .orWhere('lender_id', filters.contractor)
+      .orWhere('lender_id', filters.contractor)
 
   if filters.status?
     query.where('status', '=', filters.status)
@@ -155,13 +155,13 @@ getAll = (userId, filters, next) ->
     next(error, reply)
 
 getSummary = (userId, filters, next) ->
-  query = db.mysql()
-    .from('entry')
-    .select('entry.value', 'entry.lender_id', 'entry.debtor_id')
-    .where('entry.status', '=', '1')
-    .where (sub) ->
-      sub.where('debtor_id', userId)
-        .orWhere('lender_id', userId)
+  query = db.postgres()
+  .from('entry')
+  .select('entry.value', 'entry.lender_id', 'entry.debtor_id')
+  .where('entry.status', '=', '1')
+  .where (sub) ->
+    sub.where('debtor_id', userId)
+    .orWhere('lender_id', userId)
 
   if filters.from
     query.where('created_at', '>',  moment(filters.from).toISOString())
@@ -172,7 +172,7 @@ getSummary = (userId, filters, next) ->
   if filters.contractor
     query.where (sub) ->
       sub.where('debtor_id', filters.contractor)
-        .orWhere('lender_id', filters.contractor)
+      .orWhere('lender_id', filters.contractor)
 
   if filters.status?
     query.where('status', '=', filters.status)
@@ -196,28 +196,28 @@ getSummary = (userId, filters, next) ->
       next error, null
 
 accept = (userId, entryId, next) ->
-  db.mysql('entry')
-    .update({'accepted_at': new Date(), 'status': 1})
-    .where('id', '=', entryId)
-    .whereIn('status', [0,2]) # open|rejected
-    .where('debtor_id', '=', userId)
-    .exec (error, reply) ->
-      next(error, reply)
+  db.postgres('entry')
+  .update({'accepted_at': new Date(), 'status': 1})
+  .where('id', '=', entryId)
+  .whereIn('status', [0,2]) # open|rejected
+  .where('debtor_id', '=', userId)
+  .exec (error, reply) ->
+    next(error, reply)
 
 reject = (userId, entryId, next) ->
-  db.mysql('entry')
-    .update({'rejected_at': new Date(), 'status': 2})
-    .where('id', '=', entryId)
-    .where('status', '=', 0) # open
-    .where('debtor_id', '=', userId)
-    .exec (error, reply) ->
-      next(error, reply)
+  db.postgres('entry')
+  .update({'rejected_at': new Date(), 'status': 2})
+  .where('id', '=', entryId)
+  .where('status', '=', 0) # open
+  .where('debtor_id', '=', userId)
+  .exec (error, reply) ->
+    next(error, reply)
 
 remove = (userId, entryId, next) ->
-  db.mysql('entry')
-    .update({'status': 3})
-    .where('id', '=', entryId)
-    .where('status', '=', 0) # open
-    .where('lender_id', '=', userId)
-    .exec (error, reply) ->
-      next(error, reply)
+  db.postgres('entry')
+  .update({'status': 3})
+  .where('id', '=', entryId)
+  .where('status', '=', 0) # open
+  .where('lender_id', '=', userId)
+  .exec (error, reply) ->
+    next(error, reply)

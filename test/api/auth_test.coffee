@@ -16,7 +16,7 @@ describe 'api/auth', ->
     server.close()
     done()
 
-  it "should return code 401, when POST \"/login\" route without credentials", (done)->
+  it "should return code 400, when POST \"/login\" route without credentials", (done)->
     request(url)
       .post('/login')
       .set('Authorization', "Basic asdasd456")

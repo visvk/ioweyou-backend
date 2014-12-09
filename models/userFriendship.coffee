@@ -9,22 +9,22 @@ module.exports =
     createIfNotExists(userId, friendId, next)
 
 friendshipsExists = (userId, friendsIds, next) ->
-  db.mysql()
-    .from('user_friendship')
-    .select(
-      'id'
-    )
-    .where (sub) ->
-      sub.whereIn('creator_id', friendsIds)
-        .andWhere('friend_id', userId)
-    .orWhere (sub) ->
-      sub.whereIn('friend_id', friendsIds)
-        .andWhere('creator_id', userId)
-    .exec (error, reply) ->
-      if not error and reply.length > 0
-        next(true)
-      else
-        next(false)
+  db.postgres()
+  .from('user_friendship')
+  .select(
+    'id'
+  )
+  .where (sub) ->
+    sub.whereIn('creator_id', friendsIds)
+    .andWhere('friend_id', userId)
+  .orWhere (sub) ->
+    sub.whereIn('friend_id', friendsIds)
+    .andWhere('creator_id', userId)
+  .exec (error, reply) ->
+    if not error and reply.length > 0
+      next(true)
+    else
+      next(false)
 
 createIfNotExists = (userId, friendId, next) ->
 
@@ -33,21 +33,21 @@ createIfNotExists = (userId, friendId, next) ->
     creator_id: userId
     friend_id: friendId
 
-  db.mysql('user_friendship')
-    .whereNotExists () ->
-      this.select(db.mysql.raw(1))
-        .from('user_friendship')
-        .where('creator_id', friendId)
-        .andWhere('friend_id', userId)
-    .whereNotExists () ->
-      this.select(db.mysql.raw(1))
-        .from('user_friendship')
-        .where('friend_id', friendId)
-        .andWhere('creator_id', userId)
-    .then (rows)->
-      if rows.length > 0
-        db.mysql()
-          .insert(values)
-          .into('user_friendship')
-          .returning('id')
-          .exec next
+  db.postgres('user_friendship')
+  .whereNotExists () ->
+    this.select(db.postgres.raw(1))
+    .from('user_friendship')
+    .where('creator_id', friendId)
+    .andWhere('friend_id', userId)
+  .whereNotExists () ->
+    this.select(db.postgres.raw(1))
+    .from('user_friendship')
+    .where('friend_id', friendId)
+    .andWhere('creator_id', userId)
+  .then (rows)->
+    if rows.length > 0
+      db.postgres()
+      .insert(values)
+      .into('user_friendship')
+      .returning('id')
+      .exec next

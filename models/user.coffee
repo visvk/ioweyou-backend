@@ -16,30 +16,30 @@ module.exports =
 
 
 create = (fields, next) ->
-  db.mysql('user')
-    .insert(fields)
-    .returning('id')
-    .exec next
+  db.postgres('user')
+  .insert(fields)
+  .returning('id')
+  .exec next
 
 
 getBy = (fieldName, value, next) ->
-  db.mysql()
-    .from('user')
-    .select(
-      'user.id',
-      'user.username',
-      'user.first_name',
-      'user.last_name',
-      'user.email',
-      'sau.uid'
-    )
-    .join('user_social as sau', 'sau.user_id', '=', 'user.id', 'left')
-    .where(fieldName, value)
-    .exec (error, reply) ->
-      if not error
-        next(reply[0])
-      else
-        next(false)
+  db.postgres()
+  .from('user')
+  .select(
+    'user.id',
+    'user.username',
+    'user.first_name',
+    'user.last_name',
+    'user.email',
+    'sau.uid'
+  )
+  .join('user_social as sau', 'sau.user_id', '=', 'user.id', 'left')
+  .where(fieldName, value)
+  .exec (error, reply) ->
+    if not error
+      next(reply[0])
+    else
+      next(false)
 
 
 getById = (id, next) ->
@@ -51,23 +51,23 @@ getByFacebookId = (value, next) ->
 
 
 findAllByFacebookIds = (facebookIds, next) ->
-  db.mysql()
-    .from('user')
-    .select(
-      'user.id',
-      'user.username',
-      'user.first_name',
-      'user.last_name',
-      'user.email',
-      'sau.uid'
-    )
-    .join('user_social as sau', 'sau.user_id', '=', 'user.id', 'left')
-    .whereIn('sau.uid', facebookIds)
-    .exec next
+  db.postgres()
+  .from('user')
+  .select(
+    'user.id',
+    'user.username',
+    'user.first_name',
+    'user.last_name',
+    'user.email',
+    'sau.uid'
+  )
+  .join('user_social as sau', 'sau.user_id', '=', 'user.id', 'left')
+  .whereIn('sau.uid', facebookIds)
+  .exec next
 
 
 getFriends = (id, next) ->
-  subQuery = db.mysql.raw('
+  subQuery = db.postgres.raw('
     SELECT uf.creator_id AS friend
     FROM user_friendship uf, "user" u
     WHERE u.id = uf.friend_id AND u.id = '+id+'
@@ -77,21 +77,21 @@ getFriends = (id, next) ->
     WHERE u.id = uf.creator_id AND u.id = '+id
   )
 
-  db.mysql()
-    .from('user')
-    .select(
-      'user.id',
-      'user.username',
-      'user.first_name',
-      'user.last_name',
-      'user.email',
-      'sau.uid'
-    )
-    .whereIn('user.id', subQuery)
-    .join('user_social as sau', 'sau.user_id', '=', 'user.id', 'left')
-    .orderBy('user.last_name', 'ASC')
-    .exec (error, reply) ->
-      if not error
-        next(reply)
-      else
-        next(false)
+  db.postgres()
+  .from('user')
+  .select(
+    'user.id',
+    'user.username',
+    'user.first_name',
+    'user.last_name',
+    'user.email',
+    'sau.uid'
+  )
+  .whereIn('user.id', subQuery)
+  .join('user_social as sau', 'sau.user_id', '=', 'user.id', 'left')
+  .orderBy('user.last_name', 'ASC')
+  .exec (error, reply) ->
+    if not error
+      next(reply)
+    else
+      next(false)

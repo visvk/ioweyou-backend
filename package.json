@@ -25,6 +25,7 @@
     "mysql": "^2.5.3",
     "node-uuid": "*",
     "passport": "^0.1.18",
+    "pg": "^4.1.0",
     "q": "*",
     "redis": "*",
     "request": "*",
