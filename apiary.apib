@@ -10,7 +10,7 @@ This API is for developers who want to build functionality on top of I Owe You.
 - 401 Unauthorized - authentication failed or user doesn't have permissions for requested operation.
 - 404 Not Found - resource was not found.
 
-# Group Login
+# Group Auth
 
 ## Login [/login]
 This resource is the first. Use it to log into the API.
@@ -36,7 +36,30 @@ Use the access_token in your API calls header: authorization: "Bearer access_tok
               "access_token":"2YotnFZFEjr1zCsicMWpAA",
               "token_type":"bearer"
             }
+
+## Registration [/registration]
+
+### Register into the API [POST]
+
++ Request (application/json)
         
+    + Body
+    
+            { "username": "Joe", "password": "Doe" }
+        
++ Response 201 (application/json)
+    + Headers 
+
+            Cache-Control: no-store
+            Pragma: no-cache
+        
+    + Body
+        
+            {
+              "access_token":"2YotnFZFEjr1zCsicMWpAA",
+              "token_type":"bearer"
+            }
+                
 # Group Users
 
 ## My profile [/users/me]
@@ -79,22 +102,6 @@ Use the access_token in your API calls header: authorization: "Bearer access_tok
               "id": "2", "username": "Jolana Brocwan"
             }]
         }
-
-## Users [/users]
-
-### Create a User [POST]
-+ Request (application/json)
-    + Headers 
-
-            Authorization: Bearer 19f.3757754d6
-            
-    + Body
-
-             { "username": "Duh" }
-
-+ Response 201 (application/json)
-
-        { "id": 3, "username": "Duh" }
 
 ## User [/users/{id}]
 A single User object with all its details
