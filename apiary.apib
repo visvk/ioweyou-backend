@@ -279,7 +279,7 @@ A single Dept object with all its details
 
             { 
             "status" : "success",
-            "users" : [ 
+            "depts" : [ 
                 {
                   "id": "1", 
                   "borrower_id": "1", 
@@ -303,6 +303,25 @@ A single Dept object with all its details
 + Response 200 (application/json)
 
     + Body
+
+            { 
+            "status" : "success",
+            "isModified" : "true"
+            }
+            
+### Modify a dept [PATCH]
+
++ Request (application/json)
+    + Headers 
+
+            Authorization: Bearer 19f.3757754d6
+    + Body
+
+            {
+                "value": "10.50"
+            }    
+
++ Response 200 (application/json)           
 
             { 
             "status" : "success",
