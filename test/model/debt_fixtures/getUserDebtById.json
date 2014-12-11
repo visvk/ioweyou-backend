@@ -82,7 +82,7 @@
       "id": 3,
       "name": "debt#3",
       "value": 13,
-      "status": 1,
+      "status": 3,
       "lender_id": 1,
       "borrower_id": null,
       "borrower_name": "Peter",

@@ -30,8 +30,8 @@ getDebtQuery = ()->
   .from('debt')
   .select(
     'debt.*',
-    'borrower.username as borrower_username',
-    'lender.username as lender_username'
+    db.postgres.raw('COALESCE(borrower.username, debt.borrower_name) as borrower_name'),
+    db.postgres.raw('COALESCE(lender.username, debt.lender_name) as lender_name')
   )
   .join('user as borrower', 'borrower.id', '=', 'debt.borrower_id', 'left')
   .join('user as lender', 'lender.id', '=', 'debt.lender_id', 'left')

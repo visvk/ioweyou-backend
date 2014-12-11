@@ -46,27 +46,26 @@ filters = (req, res, next) ->
   if req.query.contractor
     req.assert('contractor', 'Invalid contractor format. Expected integer.').isInt()
 
-  if req.query.refunded
-    req.assert('refunded', 'Invalid status format. Expected integer.').isIn(['true', 'false'])
+  if req.query.status
+    req.assert('status', 'Invalid status format. Expected integer.').isInt()
 
   if req.query.order
     req.assert('order', 'Invalid order format. Expected asc or desc.').isIn(['asc', 'desc'])
 
   if req.validationErrors()
     res.status(404).send(req.validationErrors())
-    return
+  else
+    res.locals.filters =
+      limit: req.query.limit
+      offset: req.query.offset
+      from: Number(req.query.from)
+      to: Number(req.query.to)
+      contractor: req.query.contractor
+      status: req.query.status
+      order: req.query.order
+      name: req.query.name
 
-  res.locals.filters =
-    limit: req.query.limit
-    offset: req.query.offset
-    from: Number(req.query.from)
-    to: Number(req.query.to)
-    contractor: req.query.contractor
-    status: if req.query.refunded is 'true' then 3 else 0
-    order: req.query.order
-    name: req.query.name
-
-  next()
+    next()
 
 one = (req, res) ->
   req.assert('id', 'Invalid debts ID').notEmpty().isInt()
@@ -130,10 +129,11 @@ count = (req, res) ->
 
 
 create = (req, res) ->
-  req.checkBody('borrower_id', 'Borrower id required.').notEmpty()
-  req.checkBody('borrower_name', 'Borrower name required.').notEmpty()
-  req.checkBody('lender_id', 'lender id required.').notEmpty()
-  req.checkBody('lender_name', 'lender name required.').notEmpty()
+  # TODO: Check body
+#  req.checkBody('borrower_id', 'Borrower id required.').notEmpty()
+#  req.checkBody('borrower_name', 'Borrower name required.').notEmpty()
+#  req.checkBody('lender_id', 'lender id required.').notEmpty()
+#  req.checkBody('lender_name', 'lender name required.').notEmpty()
   req.checkBody('type_id', 'Type id required.').notEmpty()
   req.checkBody('value', 'Value required.').isFloat()
 
