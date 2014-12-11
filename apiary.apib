@@ -33,8 +33,7 @@ Use the access_token in your API calls header: authorization: "Bearer access_tok
     + Body
         
             {
-              "access_token":"2YotnFZFEjr1zCsicMWpAA",
-              "token_type":"bearer"
+              "access_token":"2YotnFZFEjr1zCsicMWpAA"
             }
 
 ## Registration [/registration]
@@ -56,8 +55,7 @@ Use the access_token in your API calls header: authorization: "Bearer access_tok
     + Body
         
             {
-              "access_token":"2YotnFZFEjr1zCsicMWpAA",
-              "token_type":"bearer"
+              "access_token":"2YotnFZFEjr1zCsicMWpAA"
             }
                 
 # Group Users
@@ -67,7 +65,7 @@ Use the access_token in your API calls header: authorization: "Bearer access_tok
 + Request (application/json)
     + Headers 
 
-            Authorization: Bearer 19f.3757754d6
+            Authorization: 19f.3757754d6
             
 + Response 200 (application/json)
 
@@ -90,7 +88,7 @@ Use the access_token in your API calls header: authorization: "Bearer access_tok
 + Request (application/json)
     + Headers 
 
-            Authorization: Bearer 19f.3757754d6
+            Authorization: 19f.3757754d6
 + Response 200 (application/json)
 
         {
@@ -113,7 +111,7 @@ A single User object with all its details
 + Request (application/json)
     + Headers 
 
-            Authorization: Bearer 19f.3757754d6
+            Authorization: 19f.3757754d6
             
 + Response 200 (application/json)
 
@@ -142,7 +140,7 @@ A single User object with all its details
 + Request (application/json)
     + Headers 
 
-            Authorization: Bearer 19f.3757754d6
+            Authorization: 19f.3757754d6
             
 + Response 200 (application/json)
 
@@ -162,7 +160,7 @@ A single User object with all its details
 + Request (application/json)
     + Headers 
 
-            Authorization: Bearer 19f.3757754d6
+            Authorization: 19f.3757754d6
     + Body
 
             { "user_id": "1" }
@@ -188,7 +186,7 @@ Debt status: 0 - Open, 1 - Accepted, 2 - rejected
 + Request (application/json)
     + Headers 
 
-            Authorization: Bearer 19f.3757754d6
+            Authorization: 19f.3757754d6
             
 + Response 200 (application/json)
 
@@ -196,36 +194,50 @@ Debt status: 0 - Open, 1 - Accepted, 2 - rejected
         "status": "success",
         "depts":
             [{
-              "id": "1", 
-              "borrower_id": "1", 
-              "borrower_name": "Joe Doe", 
-              "lender_id": "2", 
-              "lender_name": "Jolana Brocwan", 
-              "type_id": "1", 
-              "value": "10.50",
-              "status": null,
-              "created": "2014-11-27T22:48:27Z"
-            }, {
-              "id": "2", 
-              "borrower_id": "2", 
-              "borrower_name": "Jolana Brocwan", 
-              "lender_id": null, 
-              "lender_name": "Boris Jelcin", 
-              "type_id": "1", 
-              "value": "5.50",
-              "status": null,
-              "created": "2014-11-27T22:48:27Z"
-            }, {
-              "id": "3", 
-              "borrower_id": null, 
-              "borrower_name": "Chuck Norris", 
-              "lender_id": "2", 
-              "lender_name": "Jolana Brocwan", 
-              "type_id": "2", 
-              "value": "1",
-              "status": "2014-11-27T23:48:27Z",
-              "created": "2014-11-27T22:48:27Z"
-            }]
+            "id": 13,
+            "name": "debt#13",
+            "value": 23,
+            "status": 1,
+            "lender_id": 2,
+            "borrower_id": 3,
+            "debt_type_id": 1,
+            "accepted_at": "1999-01-01 10:10:10",
+            "rejected_at": "1999-01-01 10:10:10",
+            "created_at": "1999-01-01 10:10:10",
+            "updated_at": "1999-01-01 10:10:10",
+            "borrower_username": "user#1",
+            "lender_name": "user#2"
+            },
+            {
+            "id": 14,
+            "name": "debt#14",
+            "value": 24,
+            "status": 1,
+            "lender_id": 2,
+            "borrower_id": 3,
+            "debt_type_id": 1,
+            "accepted_at": "1999-01-01 10:10:10",
+            "rejected_at": "1999-01-01 10:10:10",
+            "created_at": "1999-01-01 10:10:10",
+            "updated_at": "1999-01-01 10:10:10",
+            "borrower_name": "user#1",
+            "lender_name": "user#2"
+            },
+            {
+            "id": 15,
+            "name": "debt#15",
+            "value": 25,
+            "status": 3,
+            "lender_id": 2,
+            "borrower_id": 3,
+            "debt_type_id": 1,
+            "accepted_at": "1999-01-01 10:10:10",
+            "rejected_at": "1999-01-01 10:10:10",
+            "created_at": "1999-01-01 10:10:10",
+            "updated_at": "1999-01-01 10:10:10",
+            "borrower_name": "user#1",
+            "lender_name": "user#2"
+        }]
         }
         
 ## Depts [/depts]
@@ -234,15 +246,13 @@ Debt status: 0 - Open, 1 - Accepted, 2 - rejected
 + Request (application/json)
     + Headers 
 
-            Authorization: Bearer 19f.3757754d6
+            Authorization: 19f.3757754d6
             
     + Body
 
             {
                 "borrower_id": "1", 
-                "borrower_name": "Joe Doe", 
-                "lender_id": "2", 
-                "lender_name": "Jolana Brocwan", 
+                "lender_name": "Notmyfriendname", 
                 "type_id": "1", 
                 "value": "10.50"
             }
@@ -250,15 +260,7 @@ Debt status: 0 - Open, 1 - Accepted, 2 - rejected
 + Response 201 (application/json)
 
             {
-              "id": "1", 
-              "borrower_id": "1", 
-              "borrower_name": "Joe Doe", 
-              "lender_id": "2", 
-              "lender_name": "Jolana Brocwan", 
-              "type_id": "1", 
-              "value": "10.50",
-              "status": 0,
-              "created": "2014-11-27T22:48:27Z"
+              "message": "Success"
             }
             
 ## Dept [/depts/{id}]
@@ -271,7 +273,7 @@ A single Dept object with all its details
 + Request (application/json)
     + Headers 
 
-            Authorization: Bearer 19f.3757754d6
+            Authorization: 19f.3757754d6
             
 + Response 200 (application/json)
 
@@ -281,16 +283,19 @@ A single Dept object with all its details
             "status" : "success",
             "depts" : [ 
                 {
-                  "id": "1", 
-                  "borrower_id": "1", 
-                  "borrower_name": "Joe Doe", 
-                  "lender_id": "2", 
-                  "lender_name": "Jolana Brocwan", 
-                  "type_id": "1", 
-                  "value": "10.50",
-                  "status": 1,
-                  "created": "2014-11-27T22:48:27Z"
-             } 
+                "id": 13,
+                "value": 23,
+                "status": 1,
+                "lender_id": 2,
+                "borrower_id": 3,
+                "debt_type_id": 1,
+                "accepted_at": "1999-01-01 10:10:10",
+                "rejected_at": "1999-01-01 10:10:10",
+                "created_at": "1999-01-01 10:10:10",
+                "updated_at": "1999-01-01 10:10:10",
+                "borrower_name": "user#1",
+                "lender_name": "user#2"
+                } 
              ]
             }
 
@@ -298,7 +303,7 @@ A single Dept object with all its details
 + Request (application/json)
     + Headers 
 
-            Authorization: Bearer 19f.3757754d6
+            Authorization: 19f.3757754d6
             
 + Response 200 (application/json)
 
@@ -314,7 +319,7 @@ A single Dept object with all its details
 + Request (application/json)
     + Headers 
 
-            Authorization: Bearer 19f.3757754d6
+            Authorization: 19f.3757754d6
     + Body
 
             {
@@ -335,7 +340,7 @@ Set debt to accepted, where borrower_id is userId
 + Request (application/json)
     + Headers 
 
-            Authorization: Bearer 19f.3757754d6
+            Authorization: 19f.3757754d6
 
 + Response 200 (application/json)           
 
@@ -351,7 +356,7 @@ Set debt to rejected, where borrower_id is userId
 + Request (application/json)
     + Headers 
 
-            Authorization: Bearer 19f.3757754d6
+            Authorization: 19f.3757754d6
 
 + Response 200 (application/json)           
 
@@ -367,7 +372,7 @@ Set debt to rejected, where borrower_id is userId
 + Request (application/json)
     + Headers 
 
-            Authorization: Bearer 19f.3757754d6
+            Authorization: 19f.3757754d6
             
 + Response 200 (application/json)
 
