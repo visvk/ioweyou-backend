@@ -293,7 +293,23 @@ A single Dept object with all its details
              } 
              ]
             }
- 
+
+### Remove a Dept [DELETE]
++ Request (application/json)
+    + Headers 
+
+            Authorization: Bearer 19f.3757754d6
+            
++ Response 200 (application/json)
+
+    + Body
+
+            { 
+            "status" : "success",
+            "isModified" : "true"
+            }
+            
+## Dept acceptation [/depts/{id}/accept]
 ### Accept a dept [PUT]
 Set debt to accepted, where borrower_id is userId
 
@@ -309,6 +325,22 @@ Set debt to accepted, where borrower_id is userId
             "isModified" : "true"
             }
 
+## Dept rejcetion [/depts/{id}/reject]
+### Reject a dept [PUT]
+Set debt to rejected, where borrower_id is userId
+
++ Request (application/json)
+    + Headers 
+
+            Authorization: Bearer 19f.3757754d6
+
++ Response 200 (application/json)           
+
+            { 
+            "status" : "success",
+            "isModified" : "true"
+            }
+            
 # Group Dept Types
 
 ## Types [/types]
