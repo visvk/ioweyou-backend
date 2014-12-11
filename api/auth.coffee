@@ -1,5 +1,6 @@
 uuid = require 'node-uuid'
 request = require 'request'
+bcrypt = require 'bcrypt'
 auth = require '../lib/auth'
 facebook = require '../lib/facebook'
 userTable = require '../models/user'
@@ -23,6 +24,16 @@ module.exports = (app) ->
 #    fetchFriendsFromFacebook,
     login
 
+  app.post '/register',
+    validateRequest,
+    prepareLocals,
+#    fetchIfUserAcceptAppFromFacebook,
+#    fetchUserDataFromFacebook,
+    checkIfUserExists,
+    register
+#    fetchFriendsFromFacebook,
+#    login
+
 prepareLocals = (req, res, next) ->
   req.session = session
   res.locals.facebookToken = req.body.pass
@@ -44,73 +55,75 @@ validateRequest = (req, res, next) ->
     next()
 
 login = (req, res) ->
-  userTokens =
-    access_token: "2YotnFZFEjr1zCsicMWpAA"
-    token_type: "bearer"
+  # TODO: This is not the best solution
+  if not res.locals.newlyRegisteredUser
+    userTable.findUser req.body.username, (user) ->
+      if user and bcrypt.compareSync(req.body.password, user.password)
+        loggedUser =
+          username: user.username
+          first_name: ''
+          last_name: ''
+          email: ''
+          ioweyouToken: uuid.v4()
+          ioweyouId: user.id.toString()
 
-  res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate')
-  res.header('Expires', '-1')
-  res.header('Pragma', 'no-cache')
-  res.status 200
-  res.send userTokens
+        req.session.setUserData loggedUser.ioweyouToken, loggedUser
+        res.header "Content-Type", "application/json"
+        res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate')
+        res.header('Expires', '-1')
+        res.header('Pragma', 'no-cache')
+        res.status 200
+        res.send access_token: loggedUser.ioweyouToken
+      else
+        res.status(401).send()
+        return
 
-#  if res.locals.existingUser
-#    user = res.locals.existingUser
-#
-#    loggedUser =
-#      username: user.username
-#      first_name: user.first_name
-#      last_name: user.last_name
-#      email: user.email
-#      facebookId: res.locals.facebookUser.id
-#      ioweyouToken: uuid.v4()
-#      ioweyouId: user.id.toString()
-#
-##    req.session.setUserData loggedUser.ioweyouToken, loggedUser
-#    res.header "Content-Type", "application/json"
-#    res.status 200
-#    res.send loggedUser
-#  else
-#    res.status(500).send('Login error occured.')
+  if res.locals.existingUser
+    user = res.locals.existingUser
 
-register = (req, res, next) ->
-  if not res.locals.existingUser
-    user = res.locals.facebookUser
-
-    newUser =
+    loggedUser =
       username: user.username
-      password: "!"
       first_name: user.first_name
       last_name: user.last_name
       email: user.email
-      date_joined: moment().format('YYYY-MM-DD HH:mm:ss')
-      last_login: moment().format('YYYY-MM-DD HH:mm:ss')
-      is_superuser: false
-      is_staff: false
-      is_active: true
+      ioweyouToken: uuid.v4()
+      ioweyouId: user.id.toString()
 
-    userTable.create newUser, (error, response) ->
-      if not error
-        newUserSocial =
-          user_id: response[0]
-          uid: res.locals.facebookUser.id
-          provider: "facebook"
-          extra_data: {}
-
-        userSocialTable.create newUserSocial, (error, newUserSocialId) ->
-          if not error
-            userTable.getByFacebookId res.locals.facebookUser.id, (user)->
-              if user
-                res.locals.newlyRegisteredUser = true
-                res.locals.existingUser = user
-                next()
-          else
-            res.status(500).send(error)
-      else
-        res.status(500).send(error)
-
+    req.session.setUserData loggedUser.ioweyouToken, loggedUser
+    res.header "Content-Type", "application/json"
+    res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate')
+    res.header('Expires', '-1')
+    res.header('Pragma', 'no-cache')
+    res.status 200
+    res.send access_token: loggedUser.ioweyouToken
   else
-    next()
+    res.status(500).send('Login error occured.')
+
+register = (req, res, next) ->
+  if res.locals.existingUser
+    res.status(400).send({ message: "Username is used"})
+    return
+
+  username = res.body.username
+
+  newUser =
+    username: username
+    password: bcrypt.hashSync(res.body.password, 10)
+    first_name: ''
+    last_name: ''
+    email:''
+    date_joined: moment().format('YYYY-MM-DD HH:mm:ss')
+    last_login: moment().format('YYYY-MM-DD HH:mm:ss')
+    is_active: true
+
+  userTable.create newUser, (error, response) ->
+    if not error
+      res.locals.newlyRegisteredUser = true
+      res.locals.existingUser = newUser
+      next()
+    else
+      res.status(500).send(error)
+
 
 #fetchIfUserAcceptAppFromFacebook = (req, res, next) ->
 #  request.get facebook.getGraphAPI.AppRequest(res.locals.facebookToken), (error, response, appResponseBody) ->
@@ -132,12 +145,12 @@ register = (req, res, next) ->
 #    else
 #      res.status(500).send('Facebook Server Error')
 
-#checkIfUserExists = (req, res, next) ->
-#  userTable.getByFacebookId res.locals.facebookUser.id, (user)->
-#    if user
-#      res.locals.existingUser = user
-#
-#    next()
+checkIfUserExists = (req, res, next) ->
+  userTable.getBy 'username', req.body.username, (user)->
+    if user
+      res.locals.existingUser = user
+
+    next()
 #
 #
 #fetchFriendsFromFacebook = (req, res, next) ->

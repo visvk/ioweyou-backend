@@ -15,14 +15,12 @@ tokenAuth = (req, res, next) ->
   token = req.header 'Authorization'
 
   if token and token isnt '(null)'
-    res.locals.user = { ioweyouId: 1};
-    next()
-#    req.session.getUserData token, (userData) ->
-#      if userData
-#        res.locals.user = userData;
-#        next()
-#      else
-#        res.status(403).send 'Forbidden'
+    req.session.getUserData token, (userData) ->
+      if userData
+        res.locals.user = userData;
+        next()
+      else
+        res.status(403).send 'Forbidden'
   else
 
     res.status(401).send 'Unauthorized'

@@ -7,6 +7,8 @@ module.exports =
     getById(id, next)
   getBy: (fieldName, value, next) ->
     getBy(fieldName, value, next)
+  findUser: (username, password, next) ->
+    findUser(username, password, next)
 #  getByFacebookId: (value, next) ->
 #    getByFacebookId(value, next)
   getFriends: (userId, next) ->
@@ -30,6 +32,22 @@ getBy = (fieldName, value, next) ->
     'user.username'
   )
   .where(fieldName, value)
+  .exec (error, reply) ->
+    if not error
+      next(reply[0])
+    else
+      next(false)
+
+findUser = (username, next) ->
+  db.postgres()
+  .from('user')
+  .select(
+    'user.id',
+    'user.username',
+    'user.username',
+    'user.password'
+  )
+  .where('username', username)
   .exec (error, reply) ->
     if not error
       next(reply[0])

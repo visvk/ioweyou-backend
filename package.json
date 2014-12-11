@@ -6,6 +6,7 @@
   "dependencies": {
     "apnagent": "*",
     "async": "^0.2.5",
+    "bcrypt": "^0.8.0",
     "body-parser": "^1.10.0",
     "chai": "*",
     "coffee-script": "*",
