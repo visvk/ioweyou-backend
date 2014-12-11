@@ -294,7 +294,8 @@ A single Dept object with all its details
              ]
             }
  
-### Refund a dept [PUT]
+### Accept a dept [PUT]
+Set debt to accepted, where borrower_id is userId
 
 + Request (application/json)
     + Headers 
@@ -305,19 +306,7 @@ A single Dept object with all its details
 
             { 
             "status" : "success",
-            "users" : [ 
-                {
-                  "id": "1", 
-                  "borrower_id": "1", 
-                  "borrower_name": "Joe Doe", 
-                  "lender_id": "2", 
-                  "lender_name": "Jolana Brocwan", 
-                  "type_id": "1", 
-                  "value": "10.50",
-                  "refunded": "2014-11-27T23:48:27Z",
-                  "created": "2014-11-27T22:48:27Z"
-             } 
-             ]
+            "isModified" : "true"
             }
 
 # Group Dept Types
