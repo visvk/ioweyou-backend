@@ -14,14 +14,14 @@ logger = require './../lib/logger'
 module.exports = (app) ->
   app.get '/debts', auth.tokenAuth, filters, list
 #  app.get '/debts/summary', auth.tokenAuth, filters, summary
-#  app.get '/debts/count', auth.tokenAuth, filters, count
-#  app.post '/debts',auth.tokenAuth, create
+  app.get '/debts/count', auth.tokenAuth, filters, count
+  app.post '/debts',auth.tokenAuth, create
 
   app.get '/debts/:id', auth.tokenAuth, one
-#  app.patch '/debts/:id', auth.tokenAuth, modify
-#  app.post '/debts/accept/:id', auth.tokenAuth, accept
-#  app.post '/debts/reject/:id', auth.tokenAuth, reject
-#  app.delete '/debts/:id', auth.tokenAuth, remove
+  app.patch '/debts/:id', auth.tokenAuth, modify
+  app.post '/debts/:id/accept', auth.tokenAuth, accept
+  app.post '/debts/:id/reject', auth.tokenAuth, reject
+  app.delete '/debts/:id', auth.tokenAuth, remove
 
 
 filters = (req, res, next) ->
@@ -46,26 +46,27 @@ filters = (req, res, next) ->
   if req.query.contractor
     req.assert('contractor', 'Invalid contractor format. Expected integer.').isInt()
 
-  if req.query.status
-    req.assert('status', 'Invalid status format. Expected integer.').isInt()
+  if req.query.refunded
+    req.assert('refunded', 'Invalid status format. Expected integer.').isIn(['true', 'false'])
 
   if req.query.order
     req.assert('order', 'Invalid order format. Expected asc or desc.').isIn(['asc', 'desc'])
 
   if req.validationErrors()
     res.status(404).send(req.validationErrors())
-  else
-    res.locals.filters =
-      limit: req.query.limit
-      offset: req.query.offset
-      from: Number(req.query.from)
-      to: Number(req.query.to)
-      contractor: req.query.contractor
-      status: req.query.status
-      order: req.query.order
-      name: req.query.name
+    return
 
-    next()
+  res.locals.filters =
+    limit: req.query.limit
+    offset: req.query.offset
+    from: Number(req.query.from)
+    to: Number(req.query.to)
+    contractor: req.query.contractor
+    status: if req.query.refunded is 'true' then 3 else 0
+    order: req.query.order
+    name: req.query.name
+
+  next()
 
 one = (req, res) ->
   req.assert('id', 'Invalid debts ID').notEmpty().isInt()
@@ -129,64 +130,64 @@ count = (req, res) ->
 
 
 create = (req, res) ->
-  req.checkBody('name', 'Nazwa nie może być pusta.').notEmpty()
-  req.checkBody('value', 'Kwota nie może być pusta. Może być liczbą całkowitą lub zmienno przecinkową.').isFloat()
-  req.checkBody('includeMe', '').isInt()
-  req.checkBody('contractors', 'Musisz wybrać chociaż jedną osobę.').notEmpty()
+  req.checkBody('borrower_id', 'Borrower id required.').notEmpty()
+  req.checkBody('borrower_name', 'Borrower name required.').notEmpty()
+  req.checkBody('lender_id', 'lender id required.').notEmpty()
+  req.checkBody('lender_name', 'lender name required.').notEmpty()
+  req.checkBody('type_id', 'Type id required.').notEmpty()
+  req.checkBody('value', 'Value required.').isFloat()
 
   if req.validationErrors()
     res.status(400).send()
-  else
-    userId = res.locals.user.ioweyouId
-    name = req.body.name
-    contractors = req.body.contractors
-    description = req.body.description
-    value = req.body.value / (contractors.length + parseInt(req.body.includeMe))
+    return
 
-    userTable.getById userId, (user) ->
-      userFriendshipTable.friendshipsExists userId, contractors, (exists) ->
-        if exists
-          for contractor in contractors
-            userTable.getById contractor, (dbContractor) =>
-              if dbContractor
-                values =
-                  name: name
-                  description: description
-                  value: value
-                  status: 0
-                  lender_id: userId
-                  debtor_id: dbContractor.id
-                  created_at: moment().format('YYYY-MM-DD HH:mm:ss')
-                  updated_at: moment().format('YYYY-MM-DD HH:mm:ss')
+  values =
+    name: ''
+    value: 0
+    status: 0
+    lender_id: null
+    borrower_id: null
+    lender_name: null
+    borrower_name: null
+    debt_type_id: 1
+    created_at: moment().format('YYYY-MM-DD HH:mm:ss')
+    updated_at: moment().format('YYYY-MM-DD HH:mm:ss')
 
-                debtsTable.create values, (error, debts)->
-                  if error
-                    res.status(404).send()
-                  else
-                    subject = "#{user.first_name} #{user.last_name} add dept to you."
+  userId = res.locals.user.ioweyouId
+  values.name = req.body.name
 
-                    event =
-                      subject: subject
-                      userId: dbContractor.id
-                      debtsId: debts
+  if userId is req.body.borrower_id
+    friendId = req.body.lender_id
+    values.lender_id = friendId
+    values.lender_name = req.body.lender_name or ''
+    values.borrower_id = req.body.borrower_id
+    values.borrower_name = ''
+  else if userId is req.body.lender_id
+    friendId = req.body.borrower_id or null
+    values.borrower_id = friendId
+    values.borrower_name = req.body.borrower_name or ''
+    values.lender_id = req.body.lender_id
+    values.lender_name = ''
 
-                    emiter.emit 'debtsCreation', event
+  values.value = req.body.value
+  values.debt_type_id = req.body.debt_type_id
 
-                    res.mailer.send 'mails/creatingConfirmation', {
-                      to: dbContractor.email,
-                      subject: subject,
-                      name: name,
-                      description: description,
-                      value: value,
-                      contractor: user
-                    }, (error) ->
+  # Save debt without friendship
+  if not friendId
+    debtsTable.create values, (error, debts)->
+      if error
+        res.status(404).send()
+      else
+        res.status(201).send({ message: "Success"})
 
-              else
-                res.status(404).send()
-
-            res.status(201).send {isCreated: true}
-        else
-          res.status(404).send()
+  if friendId
+    userFriendshipTable.friendshipsExists userId, [friendId], (exists) ->
+      if exists
+        debtsTable.create values, (error, debts)->
+          if error
+            res.status(404).send()
+          else
+            res.status(201).send({ message: "Success"})
 
 
 accept = (req, res) ->
@@ -194,37 +195,16 @@ accept = (req, res) ->
 
   if req.validationErrors()
     res.status(400).send()
-  else
-    debtsId = req.params.id
-    userId = res.locals.user.ioweyouId
+    return
 
-    debtsTable.accept userId, debtsId, (error, isModified) ->
-      if isModified
-        debtsTable.getById debtsId, (error, debts)->
-          if error
-            res.status(400).send()
-          else
-            userTable.getById debts.lender_id, (lender)->
-              userTable.getById debts.debtor_id, (debtor)->
-                subject = "#{debtor.first_name} #{debtor.last_name} accepted your debts."
+  debtsId = req.params.id
+  userId = res.locals.user.ioweyouId
 
-                event =
-                  subject: subject
-                  userId: lender.id
-                  debtsId: debtsId
-
-                emiter.emit 'debtsAcceptance', event
-
-                res.mailer.send 'mails/acceptance', {
-                  to: lender.email,
-                  subject: subject,
-                  debts: debts,
-                  debtor: debtor
-                }, (error) ->
-      if error
-        res.status(400).send {isModified: isModified}
-      else
-        res.status(200).send {isModified: isModified}
+  debtsTable.accept userId, debtsId, (error, isModified) ->
+    if error
+      res.status(400).send {isModified: isModified}
+    else
+      res.status(200).send {isModified: isModified}
 
 
 reject = (req, res) ->
@@ -232,36 +212,16 @@ reject = (req, res) ->
 
   if req.validationErrors()
     res.status(400).send()
-  else
-    debtsId = req.params.id
-    userId = res.locals.user.ioweyouId
+    return
 
-    debtsTable.reject userId, debtsId, (error, isModified) ->
-      if isModified
-        debtsTable.getById debtsId, (error, debts)->
-          userTable.getById debts.lender_id, (lender)->
-            userTable.getById debts.debtor_id, (debtor)->
+  debtsId = req.params.id
+  userId = res.locals.user.ioweyouId
 
-              subject = "#{debtor.first_name} #{debtor.last_name} rejected your debts."
-
-              event =
-                subject: subject
-                userId: lender.id
-                debtsId: debtsId
-
-              emiter.emit 'debtsRejection', event
-
-              res.mailer.send 'mails/rejection', {
-                to: lender.email,
-                subject: subject,
-                debts: debts,
-                debtor: debtor
-                }, (error) ->
-
-      if error
-        res.status(500).send()
-      else
-        res.status(200).send {isModified: isModified}
+  debtsTable.reject userId, debtsId, (error, isModified) ->
+    if error
+      res.status(500).send()
+    else
+      res.status(200).send {isModified: isModified}
 
 
 remove = (req, res) ->
@@ -269,69 +229,44 @@ remove = (req, res) ->
 
   if req.validationErrors()
     res.status(400).send(req.validationErrors())
-  else
-    debtsId = req.params.id
-    userId = res.locals.user.ioweyouId
+    return
 
-    debtsTable.remove userId, debtsId, (error, isModified) ->
-      res.header "Content-Type", "application/json"
-      if error
-        res.status(500).send()
-      else if isModified
-        res.status(204).send {isModified: isModified}
-      else
-        res.status(404).send()
+  debtsId = req.params.id
+  userId = res.locals.user.ioweyouId
+
+  debtsTable.remove userId, debtsId, (error, isModified) ->
+    res.header "Content-Type", "application/json"
+    if error
+      res.status(500).send()
+    else if isModified
+      res.status(204).send {isModified: isModified}
+    else
+      res.status(404).send()
 
 
 modify = (req, res) ->
   req.assert('id', 'Invalid uid').notEmpty().isInt()
-  req.checkBody('name', 'Nazwa nie może być pusta.').notEmpty()
-  req.checkBody('value', 'Kwota nie może być pusta. Może być liczbą całkowitą lub zmienno przecinkową').isFloat()
+  req.checkBody('value', 'Value must be number').isFloat()
 
   if req.validationErrors()
     res.status(400).send(req.validationErrors())
-  else
-    debtsId = req.params.id
-    userId = res.locals.user.ioweyouId
-    name = req.body.name
-    description = req.body.description
-    value = req.body.value
+    return
 
-    values =
-      name: name
-      description: description
-      value: value
-      updated_at: moment().format('YYYY-MM-DD HH:mm:ss')
+  debtsId = req.params.id
+  userId = res.locals.user.ioweyouId
+  name = req.body.name
+  value = req.body.value
 
-    debtsTable.modify userId, debtsId, values, (error, isModified) ->
-      if isModified
-        debtsTable.getById debtsId, (error, debts)->
-          if error
-            res.status(400).send()
-          else
-            userTable.getById debts.lender_id, (lender)->
-              userTable.getById debts.debtor_id, (debtor)->
+  values =
+    name: name
+    value: value
+    updated_at: moment().format('YYYY-MM-DD HH:mm:ss')
 
-                subject = "#{lender.first_name} #{lender.last_name} modified debts."
-
-                event =
-                  subject: subject
-                  userId: debtor.id
-                  debtsId: debtsId
-
-                emiter.emit 'debtsRejection', event
-
-                res.mailer.send 'mails/modification', {
-                  to: debtor.email,
-                  subject: subject,
-                  debts: debts,
-                  lender: lender
-                  }, (error) ->
-
-      if error
-        res.status(500).send()
-      else
-        res.status(200).send {isModified: isModified}
+  debtsTable.modify userId, debtsId, values, (error, isModified) ->
+    if error
+      res.status(500).send()
+    else
+      res.status(200).send {isModified: isModified}
 
 
 

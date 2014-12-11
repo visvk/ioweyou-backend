@@ -65,97 +65,97 @@ describe 'model/debt', ()->
 #        expect(debt).to.be.undefined
 #        done()
 #
-#  describe 'getAll', ()->
-#
-#    beforeEach (done)->
-#      clearDatabase.exec (error, result) ->
-#        syncDatabase.exec (error, result) ->
-#          fixturesDatabase.load '/test/model/debt_fixtures/getAll.json', (error, result)->
-#            done()
-#
-#    it "should return 8 entries, if user is lender and there is no filters", (done)->
-#      debtTable.getAll 1, {}, (error, entries)->
-#        expect(entries.length).to.eql(8)
-#        done()
-#
-#    it "should return 2 entries, if from is equal \"1999-02-02 00:00:00\"", (done)->
-#      filters =
-#        from: moment("1999-02-02 00:00:00").valueOf()
-#
-#      debtTable.getAll 1, filters, (error, entries)->
-#        expect(entries.length).to.eql(2)
-#        done()
-#
-#    it "should return 1 debt, if to is equal \"1999-01-01 00:00:00\"", (done)->
-#      filters =
-#        to: moment("1999-01-01 00:00:00").valueOf()
-#
-#      debtTable.getAll 1, filters, (error, entries)->
-#        expect(entries.length).to.eql(1)
-#        done()
-#
-#    it "should return 1 debt, if contractor is equal \"3\"", (done)->
-#      filters =
-#        contractor: 3
-#
-#      debtTable.getAll 1, filters, (error, entries)->
-#        expect(entries.length).to.eql(1)
-#        done()
-#
-#    it "should return no entries, if status is equal \"3\"", (done)->
-#      filters =
-#        status: 3
-#
-#      debtTable.getAll 1, filters, (error, entries)->
-#        expect(entries.length).to.eql(0)
-#        done()
-#
-#    it "should return 1 debt, if status is equal \"2\"", (done)->
-#      filters =
-#        status: 2
-#
-#      debtTable.getAll 1, filters, (error, entries)->
-#        expect(entries.length).to.eql(1)
-#        done()
-#
-#    it "should return 8 entries, if name is equal \"debt\"", (done)->
-#      filters =
-#        name: "debt"
-#
-#      debtTable.getAll 1, filters, (error, entries)->
-#        expect(entries.length).to.eql(8)
-#        done()
-#
-#    it "should return 2 entries, if name is equal \"1\"", (done)->
-#      filters =
-#        name: "1"
-#
-#      debtTable.getAll 1, filters, (error, entries)->
-#        expect(entries.length).to.eql(2)
-#        done()
-#
-#    it "should return 4 entries, if limit is equal \"4\"", (done)->
-#      filters =
-#        limit: 4
-#
-#      debtTable.getAll 1, filters, (error, entries)->
-#        expect(entries.length).to.eql(4)
-#        done()
-#
-#    it "should return 2 entries, if limit is equal \"4\" and offset is equal \"6\"", (done)->
-#      filters =
-#        limit: 4
-#        offset: 6
-#
-#      debtTable.getAll 1, filters, (error, entries)->
-#        expect(entries.length).to.eql(2)
-#        done()
-#
-#    it "should return no entries, if user does not exists", (done)->
-#      debtTable.getAll 4, {}, (error, entries)->
-#        expect(entries.length).to.eql(0)
-#        done()
-#
+  describe 'getAll', ()->
+
+    beforeEach (done)->
+      clearDatabase.exec (error, result) ->
+        syncDatabase.exec (error, result) ->
+          fixturesDatabase.load '/test/model/debt_fixtures/getAll.json', (error, result)->
+            done()
+
+    it "should return 8 entries, if user is lender and there is no filters", (done)->
+      debtTable.getAll 1, {}, (error, entries)->
+        expect(entries.length).to.eql(8)
+        done()
+
+    it "should return 2 entries, if from is equal \"1999-02-02 00:00:00\"", (done)->
+      filters =
+        from: moment("1999-02-02 00:00:00").valueOf()
+
+      debtTable.getAll 1, filters, (error, entries)->
+        expect(entries.length).to.eql(2)
+        done()
+
+    it "should return 1 debt, if to is equal \"1999-01-01 00:00:00\"", (done)->
+      filters =
+        to: moment("1999-01-01 00:00:00").valueOf()
+
+      debtTable.getAll 1, filters, (error, entries)->
+        expect(entries.length).to.eql(1)
+        done()
+
+    it "should return 1 debt, if contractor is equal \"3\"", (done)->
+      filters =
+        contractor: 3
+
+      debtTable.getAll 1, filters, (error, entries)->
+        expect(entries.length).to.eql(1)
+        done()
+
+    it "should return no entries, if status is equal \"3\"", (done)->
+      filters =
+        status: 3
+
+      debtTable.getAll 1, filters, (error, entries)->
+        expect(entries.length).to.eql(0)
+        done()
+
+    it "should return 1 debt, if status is equal \"2\"", (done)->
+      filters =
+        status: 2
+
+      debtTable.getAll 1, filters, (error, entries)->
+        expect(entries.length).to.eql(1)
+        done()
+
+    it "should return 8 entries, if name is equal \"debt\"", (done)->
+      filters =
+        name: "debt"
+
+      debtTable.getAll 1, filters, (error, entries)->
+        expect(entries.length).to.eql(8)
+        done()
+
+    it "should return 2 entries, if name is equal \"1\"", (done)->
+      filters =
+        name: "1"
+
+      debtTable.getAll 1, filters, (error, entries)->
+        expect(entries.length).to.eql(2)
+        done()
+
+    it "should return 4 entries, if limit is equal \"4\"", (done)->
+      filters =
+        limit: 4
+
+      debtTable.getAll 1, filters, (error, entries)->
+        expect(entries.length).to.eql(4)
+        done()
+
+    it "should return 2 entries, if limit is equal \"4\" and offset is equal \"6\"", (done)->
+      filters =
+        limit: 4
+        offset: 6
+
+      debtTable.getAll 1, filters, (error, entries)->
+        expect(entries.length).to.eql(2)
+        done()
+
+    it "should return no entries, if user does not exists", (done)->
+      debtTable.getAll 4, {}, (error, entries)->
+        expect(entries.length).to.eql(0)
+        done()
+
 #  describe 'getSummary', ()->
 #
 #    beforeEach (done)->

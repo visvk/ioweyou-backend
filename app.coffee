@@ -21,8 +21,10 @@ mailer.extend app, config.mailer
 
 #Controllers
 require('./api/debt')(app)
+require('./api/debtType')(app)
 require('./api/auth')(app)
 require('./api/user')(app)
+require('./api/friend')(app)
 
 #if config.apn.env in ["prod", "dev"]
 #  apn = require('./lib/apn').apn

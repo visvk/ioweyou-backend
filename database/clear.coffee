@@ -53,8 +53,8 @@ dropDebtTable = (next) ->
     grunt.verbose.errorlns error
 
 dropDeptTypeTable = (next) ->
-  db.postgres.schema.dropTableIfExists('dept_type').then ()->
-    grunt.verbose.oklns 'dept_type table droped successfully.'
+  db.postgres.schema.dropTableIfExists('debt_type').then ()->
+    grunt.verbose.oklns 'debt_type table droped successfully.'
     next(null, true)
   , (error) ->
     grunt.verbose.errorlns error

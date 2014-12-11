@@ -24,15 +24,24 @@
         }
     },
     {
+        "table": "debt_type",
+        "data": {
+          "id": 1,
+          "name": "Coffee",
+          "created_at": "1999-01-01 10:10:10",
+          "updated_at": "1999-01-01 10:10:10"
+        }
+    },
+    {
         "table": "debt",
         "data": {
             "id": 1,
             "name": "debt#1",
-            "description": "-",
             "value": 10,
             "status": 1,
             "lender_id": 1,
             "borrower_id": 2,
+            "debt_type_id": 1,
             "accepted_at": "1999-01-01 10:10:10",
             "rejected_at": "1999-01-01 10:10:10",
             "created_at": "1999-01-01 10:10:10",
@@ -44,11 +53,11 @@
         "data": {
             "id": 2,
             "name": "debt#2",
-            "description": "-",
             "value": 10,
             "status": 1,
             "lender_id": 2,
             "borrower_id": 1,
+            "debt_type_id": 1,
             "accepted_at": "1999-01-01 10:10:10",
             "rejected_at": "1999-01-01 10:10:10",
             "created_at": "1999-01-01 10:10:10",
@@ -60,11 +69,11 @@
         "data": {
             "id": 3,
             "name": "debt#3",
-            "description": "-",
             "value": 10,
             "status": 3,
             "lender_id": 1,
             "borrower_id": 2,
+            "debt_type_id": 1,
             "accepted_at": "1999-01-01 10:10:10",
             "rejected_at": "1999-01-01 10:10:10",
             "created_at": "1999-01-01 10:10:10",

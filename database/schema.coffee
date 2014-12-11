@@ -79,15 +79,15 @@ createUserFriendshipTable = (next) ->
     next(error)
 
 createDeptTypeTable = (next) ->
-  db.postgres.schema.createTable 'dept_type', (table)->
+  db.postgres.schema.createTable 'debt_type', (table)->
     table.bigIncrements('id')
     table.string('name', 255).notNullable()
     table.timestamps()
   .then ()->
-    grunt.verbose.oklns 'EntryComment table created successfully'
+    grunt.verbose.oklns 'debt_type table created successfully'
     next(null, true)
   , (error) ->
-    grunt.verbose.errorlns 'EntryComment table was not created, error occurred.'
+    grunt.verbose.errorlns 'debt_type table was not created, error occurred.'
     next(error)
 
 createDeptTable = (next) ->
@@ -109,11 +109,11 @@ createDeptTable = (next) ->
     .references('id')
     .inTable('user')
     .onDelete("SET NULL")
-    table.integer('dept_type_id')
+    table.integer('debt_type_id')
     .notNullable()
     .unsigned()
     .references('id')
-    .inTable('dept_type')
+    .inTable('debt_type')
     .onDelete("SET NULL")
     table.string('lender_name', 255)
     table.timestamp('accepted_at')

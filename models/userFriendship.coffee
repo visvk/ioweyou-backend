@@ -45,6 +45,7 @@ createIfNotExists = (userId, friendId, next) ->
     .where('friend_id', friendId)
     .andWhere('creator_id', userId)
   .then (rows)->
+    console.log rows
     if rows.length > 0
       db.postgres()
       .insert(values)

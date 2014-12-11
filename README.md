@@ -1,7 +1,8 @@
 I Owe YOU! (back end)
 ===============
+School project
 
-I Owe YOU! is an app that is used to track the debts. Based on Node.js (Express Framework), and Mysql/Redis databases.
+I Owe YOU! is an app that is used to track the debts. Based on Node.js (Express Framework), and PostgreSQL/Redis databases.
 
 [![Build Status](https://travis-ci.org/piotrkowalczuk/ioweyou-backend.png?branch=develop)](https://travis-ci.org/piotrkowalczuk/ioweyou-backend)
 
@@ -14,5 +15,5 @@ Setup
 
 Dependencies
 ------------
-- Mysql
+- PostgreSQL
 - Redis
