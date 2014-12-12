@@ -26,3 +26,22 @@ describe 'api/auth', ->
         console.log res.body
         if err then throw err
         done()
+
+  it "should return code 401, when POST \"/login\" route with bad credentials", (done)->
+    request(url)
+      .post('/login')
+      .send({ username: "bafd", password: "login"})
+      .expect(401)
+      .end (err,res) ->
+        if err then throw err
+        done()
+
+  describe 'registration', ->
+    it "should return 400 after [POST] /register", (done) ->
+      request(url)
+      .post('/register')
+      .send({ username: "", password: ""})
+      .expect(400)
+      .end (err,res) ->
+        if err then throw err
+        done()

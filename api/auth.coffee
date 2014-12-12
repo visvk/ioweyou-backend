@@ -17,31 +17,17 @@ module.exports = (app) ->
   app.post '/login',
     validateRequest,
     prepareLocals,
-#    fetchIfUserAcceptAppFromFacebook,
-#    fetchUserDataFromFacebook,
-#    checkIfUserExists,
-#    register,
-#    fetchFriendsFromFacebook,
     login
 
   app.post '/register',
     validateRequest,
     prepareLocals,
-#    fetchIfUserAcceptAppFromFacebook,
-#    fetchUserDataFromFacebook,
     checkIfUserExists,
     register
-#    fetchFriendsFromFacebook,
-#    login
 
 prepareLocals = (req, res, next) ->
   req.session = session
-  res.locals.facebookToken = req.body.pass
-  res.locals.isAppAccepted = false
-  res.locals.facebookUser = null
   res.locals.existingUser = null
-  res.locals.userFriends = null
-  res.locals.newlyRegisteredUser = false
 
   next()
 
@@ -55,72 +41,63 @@ validateRequest = (req, res, next) ->
     next()
 
 login = (req, res) ->
-  # TODO: This is not the best solution
-  if not res.locals.newlyRegisteredUser
-    userTable.findUser req.body.username, (user) ->
-      if user and bcrypt.compareSync(req.body.password, user.password)
-        loggedUser =
-          username: user.username
-          first_name: ''
-          last_name: ''
-          email: ''
-          ioweyouToken: uuid.v4()
-          ioweyouId: user.id.toString()
+  userTable.findUser req.body.username, (user) ->
+    if user and bcrypt.compareSync(req.body.password, user.password)
+      loggedUser =
+        username: user.username
+        first_name: ''
+        last_name: ''
+        email: ''
+        ioweyouToken: uuid.v4()
+        ioweyouId: user.id.toString()
 
-        req.session.setUserData loggedUser.ioweyouToken, loggedUser
-        res.header "Content-Type", "application/json"
-        res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate')
-        res.header('Expires', '-1')
-        res.header('Pragma', 'no-cache')
-        res.status 200
-        res.send access_token: loggedUser.ioweyouToken
-      else
-        res.status(401).send()
-        return
-
-  if res.locals.existingUser
-    user = res.locals.existingUser
-
-    loggedUser =
-      username: user.username
-      first_name: user.first_name
-      last_name: user.last_name
-      email: user.email
-      ioweyouToken: uuid.v4()
-      ioweyouId: user.id.toString()
-
-    req.session.setUserData loggedUser.ioweyouToken, loggedUser
-    res.header "Content-Type", "application/json"
-    res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate')
-    res.header('Expires', '-1')
-    res.header('Pragma', 'no-cache')
-    res.status 200
-    res.send access_token: loggedUser.ioweyouToken
-  else
-    res.status(500).send('Login error occured.')
+      req.session.setUserData loggedUser.ioweyouToken, loggedUser
+      res.header "Content-Type", "application/json"
+      res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate')
+      res.header('Expires', '-1')
+      res.header('Pragma', 'no-cache')
+      res.status 200
+      res.send access_token: loggedUser.ioweyouToken
+    else
+      logger.warn "Bad request to get token (bad credentials) for user: #{req.body.username} from #{req.connection.remoteAddress} "
+      res.header('WWW-Authenticate': 'Basic realm="email:password"')
+      res.status 401
+      res.send error: "Unauthorized"
 
 register = (req, res, next) ->
   if res.locals.existingUser
     res.status(400).send({ message: "Username is used"})
     return
 
-  username = res.body.username
+  username = req.body.username
 
   newUser =
     username: username
-    password: bcrypt.hashSync(res.body.password, 10)
+    password: bcrypt.hashSync(req.body.password, 10)
     first_name: ''
     last_name: ''
     email:''
-    date_joined: moment().format('YYYY-MM-DD HH:mm:ss')
-    last_login: moment().format('YYYY-MM-DD HH:mm:ss')
+    created_at: moment().format('YYYY-MM-DD HH:mm:ss')
     is_active: true
 
   userTable.create newUser, (error, response) ->
-    if not error
-      res.locals.newlyRegisteredUser = true
-      res.locals.existingUser = newUser
-      next()
+    if not error and response.length > 0
+
+      loggedUser =
+        username: newUser.username
+        first_name: newUser.first_name
+        last_name: newUser.last_name
+        email: newUser.email
+        ioweyouToken: uuid.v4()
+        ioweyouId: response[0].toString()
+
+      req.session.setUserData loggedUser.ioweyouToken, loggedUser
+      res.header "Content-Type", "application/json"
+      res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate')
+      res.header('Expires', '-1')
+      res.header('Pragma', 'no-cache')
+      res.status 200
+      res.send access_token: loggedUser.ioweyouToken
     else
       res.status(500).send(error)
 
