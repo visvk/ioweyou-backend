@@ -24,6 +24,11 @@ module.exports = (app) ->
   app.delete '/debts/:id', auth.tokenAuth, remove
 
 
+_formatResponse = (debts) ->
+  response =
+    status: "Success"
+    debts: debts
+
 filters = (req, res, next) ->
 
   res.locals.filters = {}
@@ -73,19 +78,20 @@ one = (req, res) ->
   if req.validationErrors()
     logger.warn "Debt validation Error: ", req.validationErrors()
     res.status(400).send()
-  else
-    debtsId = req.params.id
-    userId = res.locals.user.ioweyouId
+    return
 
-    debtsTable.getUserEntryById userId, debtsId, (error, debts) ->
-      res.header "Content-Type", "application/json"
-      if error
-        logger.warn "Debt one error: ", error
-        res.status(500).send()
-      else if debts
-        res.send debts
-      else
-        res.status(404).send()
+  debtsId = req.params.id
+  userId = res.locals.user.ioweyouId
+
+  debtsTable.getUserDebtById userId, debtsId, (error, debts) ->
+    res.header "Content-Type", "application/json"
+    if error
+      logger.warn "Debt one error: ", error
+      res.status(500).send()
+    else if debts
+      res.send _formatResponse [debts]
+    else
+      res.status(404).send()
 
 
 list = (req, res) ->
@@ -97,7 +103,7 @@ list = (req, res) ->
       logger.warn "Debt List Error: ", error
       res.status(500).send {error: 'Internal Server Error.'}
     else if debts
-      res.send debts
+      res.send _formatResponse debts
     else
       res.status(404).send {error: "Not Found."}
 

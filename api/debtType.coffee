@@ -6,6 +6,11 @@ module.exports = (app) ->
   app.get '/types', auth.tokenAuth, list
 
 
+_formatResponse = (types) ->
+  response =
+    status: "Success"
+    types: types
+
 list = (req, res) ->
 
   debtTypeTable.getAll (error, types) ->
@@ -13,4 +18,4 @@ list = (req, res) ->
     if error
       res.status(500).send {error: 'Internal Server Error.'}
     else
-      res.send types
+      res.send _formatResponse types

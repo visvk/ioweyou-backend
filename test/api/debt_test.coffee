@@ -16,27 +16,13 @@ describe 'api/debt', ->
     server.close()
     done()
 
-  beforeEach (done)->
-
   it "should return code 401, when GET \"/debts\" route without credentials", (done)->
     request(url)
       .get('/debts')
       .set('Authorization', "")
-      .expect('Content-Type', /json/)
       .expect(401)
       .end (err,res) ->
 #        console.log res.body
-        if err then throw err
-        done()
-
-  it "should return code 200, when GET \"/debts\" route with token", (done)->
-    request(url)
-      .get('/debts')
-      .set('Authorization', "Bearer llll")
-  #      .expect('Content-Type', /json/)
-      .expect(200)
-      .end (err,res) ->
-        console.log res.body
         if err then throw err
         done()
 

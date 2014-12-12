@@ -8,13 +8,19 @@ module.exports = (app) ->
   app.post '/friends', auth.tokenAuth, addFriend
 
 
+_formatResponse = (friends) ->
+  response =
+    status: "Success"
+    friends: friends
+
+
 getFriends = (req, res) ->
   userId = res.locals.user.ioweyouId
 
   userTable.getFriends userId, (friends) =>
     if friends
       res.header "Content-Type", "application/json"
-      res.send(friends)
+      res.send _formatResponse friends
     else
       res.status(404).send()
 

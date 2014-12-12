@@ -14,6 +14,14 @@ app.set('view engine', 'jade')
 
 app.use morgan('dev', { "stream": logger.stream })
 app.use bodyParser.json()
+app.use (req, res, next) ->
+  if not req.get('Origin') then return next()
+  res.header "Access-Control-Allow-Origin", "*"
+  res.header "Access-Control-Allow-Methods": 'PUT, GET, POST, DELETE, PATCH'
+  res.header "Access-Control-Allow-Headers": 'X-Requested-With, Authorization, Content-Type'
+  res.contentType 'application/json'
+  if ('OPTIONS' == req.method) then return res.status(200).send()
+  next()
 app.use expressValidator({
   errorFormatter: validator.errorFormatter
 })
