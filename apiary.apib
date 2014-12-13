@@ -10,7 +10,7 @@ This API is for developers who want to build functionality on top of I Owe You.
 - 401 Unauthorized - authentication failed or user doesn't have permissions for requested operation.
 - 404 Not Found - resource was not found.
 
-# Group Login
+# Group Auth
 
 ## Login [/login]
 This resource is the first. Use it to log into the API.
@@ -33,14 +33,40 @@ Use the access_token in your API calls header: authorization: "Bearer access_tok
     + Body
         
             {
-              "access_token":"2YotnFZFEjr1zCsicMWpAA",
-              "token_type":"bearer"
+              "access_token":"2YotnFZFEjr1zCsicMWpAA"
             }
+
+## Registration [/registration]
+
+### Register into the API [POST]
+
++ Request (application/json)
         
+    + Body
+    
+            { "username": "Joe", "password": "Doe" }
+        
++ Response 201 (application/json)
+    + Headers 
+
+            Cache-Control: no-store
+            Pragma: no-cache
+        
+    + Body
+        
+            {
+              "access_token":"2YotnFZFEjr1zCsicMWpAA"
+            }
+                
 # Group Users
 
 ## My profile [/users/me]
 ### My profile [GET]
++ Request (application/json)
+    + Headers 
+
+            Authorization: 19f.3757754d6
+            
 + Response 200 (application/json)
 
         {
@@ -59,6 +85,10 @@ Use the access_token in your API calls header: authorization: "Bearer access_tok
     + filter%5Bwhere%5D%5Busername%5D%5Blike%5D (optional, string, `Joe`) ... get users where username like input
     
 ### List all Users [GET]
++ Request (application/json)
+    + Headers 
+
+            Authorization: 19f.3757754d6
 + Response 200 (application/json)
 
         {
@@ -71,17 +101,6 @@ Use the access_token in your API calls header: authorization: "Bearer access_tok
             }]
         }
 
-## Users [/users]
-
-### Create a User [POST]
-+ Request (application/json)
-
-        { "username": "Duh" }
-
-+ Response 201 (application/json)
-
-        { "id": 3, "username": "Duh" }
-
 ## User [/users/{id}]
 A single User object with all its details
 
@@ -89,6 +108,11 @@ A single User object with all its details
     + id (required, number, `1`) ... Numeric `id` of the User to perform action with. Has example value.
 
 ### Retrieve a User [GET]
++ Request (application/json)
+    + Headers 
+
+            Authorization: 19f.3757754d6
+            
 + Response 200 (application/json)
 
     + Body
@@ -113,6 +137,11 @@ A single User object with all its details
     + user_id (optional, int, `1`) ... get friend by user_id
     
 ### List all Friends [GET]
++ Request (application/json)
+    + Headers 
+
+            Authorization: 19f.3757754d6
+            
 + Response 200 (application/json)
 
         {
@@ -129,91 +158,109 @@ A single User object with all its details
 
 ### Add friend [POST]
 + Request (application/json)
+    + Headers 
 
-        { "user_id": "1" }
+            Authorization: 19f.3757754d6
+    + Body
+
+            { "user_id": "1" }
 
 + Response 201 (application/json)
 
         {"status": "success"}
         
 # Group Depts
-
-## Depts [/depts{?borrower_id,borrower_name,lender_id,lender_name,type_id,refunded,limit,offset}]
+Debt status: 0 - Open, 1 - Accepted, 2 - rejected
+## Depts [/depts{?borrower_id,borrower_name,lender_id,lender_name,type_id,status,limit,offset}]
 + Parameters
     + borrower_id (optional, int, `1`) ... get depts by borrower_id
     + borrower_name (optional, string, `Joe Doe`) ... get depts by borrower_name
     + lender_id (optional, int, `2`) ... get depts by lender_id
     + lender_name (optional, string, `Jolana Brocwan`) ... get depts by lender_name
     + type_id (optional, int, `1`) ... get depts by type_id
-    + refunded (optional, boolean, `false`) ... get depts by refund, when false, dept is not refunded, **default**: false
+    + status (optional, boolean, `0`) ... get depts by status
     + limit (optional, int, `10`) ... **default**: 10
     + offset (optional, int, `0`)
     
 ### List all Depts [GET]
++ Request (application/json)
+    + Headers 
+
+            Authorization: 19f.3757754d6
+            
 + Response 200 (application/json)
 
         {
         "status": "success",
         "depts":
             [{
-              "id": "1", 
-              "borrower_id": "1", 
-              "borrower_name": "Joe Doe", 
-              "lender_id": "2", 
-              "lender_name": "Jolana Brocwan", 
-              "type_id": "1", 
-              "value": "10.50",
-              "refunded": null,
-              "created": "2014-11-27T22:48:27Z"
-            }, {
-              "id": "2", 
-              "borrower_id": "2", 
-              "borrower_name": "Jolana Brocwan", 
-              "lender_id": null, 
-              "lender_name": "Boris Jelcin", 
-              "type_id": "1", 
-              "value": "5.50",
-              "refunded": null,
-              "created": "2014-11-27T22:48:27Z"
-            }, {
-              "id": "3", 
-              "borrower_id": null, 
-              "borrower_name": "Chuck Norris", 
-              "lender_id": "2", 
-              "lender_name": "Jolana Brocwan", 
-              "type_id": "2", 
-              "value": "1",
-              "refunded": "2014-11-27T23:48:27Z",
-              "created": "2014-11-27T22:48:27Z"
-            }]
+            "id": 13,
+            "name": "debt#13",
+            "value": 23,
+            "status": 1,
+            "lender_id": 2,
+            "borrower_id": 3,
+            "debt_type_id": 1,
+            "accepted_at": "1999-01-01 10:10:10",
+            "rejected_at": "1999-01-01 10:10:10",
+            "created_at": "1999-01-01 10:10:10",
+            "updated_at": "1999-01-01 10:10:10",
+            "borrower_username": "user#1",
+            "lender_name": "user#2"
+            },
+            {
+            "id": 14,
+            "name": "debt#14",
+            "value": 24,
+            "status": 1,
+            "lender_id": 2,
+            "borrower_id": 3,
+            "debt_type_id": 1,
+            "accepted_at": "1999-01-01 10:10:10",
+            "rejected_at": "1999-01-01 10:10:10",
+            "created_at": "1999-01-01 10:10:10",
+            "updated_at": "1999-01-01 10:10:10",
+            "borrower_name": "user#1",
+            "lender_name": "user#2"
+            },
+            {
+            "id": 15,
+            "name": "debt#15",
+            "value": 25,
+            "status": 3,
+            "lender_id": 2,
+            "borrower_id": 3,
+            "debt_type_id": 1,
+            "accepted_at": "1999-01-01 10:10:10",
+            "rejected_at": "1999-01-01 10:10:10",
+            "created_at": "1999-01-01 10:10:10",
+            "updated_at": "1999-01-01 10:10:10",
+            "borrower_name": "user#1",
+            "lender_name": "user#2"
+        }]
         }
         
 ## Depts [/depts]
 
 ### Add Dept [POST]
 + Request (application/json)
+    + Headers 
 
-        {
-            "borrower_id": "1", 
-            "borrower_name": "Joe Doe", 
-            "lender_id": "2", 
-            "lender_name": "Jolana Brocwan", 
-            "type_id": "1", 
-            "value": "10.50"
-        }
+            Authorization: 19f.3757754d6
+            
+    + Body
+
+            {
+                "borrower_id": "1", 
+                "lender_name": "Notmyfriendname", 
+                "type_id": "1", 
+                "value": "10.50"
+            }
 
 + Response 201 (application/json)
 
             {
-              "id": "1", 
-              "borrower_id": "1", 
-              "borrower_name": "Joe Doe", 
-              "lender_id": "2", 
-              "lender_name": "Jolana Brocwan", 
-              "type_id": "1", 
-              "value": "10.50",
-              "refunded": null,
-              "created": "2014-11-27T22:48:27Z"
+              "message": "Success"
             }
             
 ## Dept [/depts/{id}]
@@ -223,56 +270,110 @@ A single Dept object with all its details
     + id (required, number, `1`) ... Numeric `id` of the Dept to perform action with. Has example value.
 
 ### Retrieve a Dept [GET]
++ Request (application/json)
+    + Headers 
+
+            Authorization: 19f.3757754d6
+            
 + Response 200 (application/json)
 
     + Body
 
             { 
             "status" : "success",
-            "users" : [ 
+            "depts" : [ 
                 {
-                  "id": "1", 
-                  "borrower_id": "1", 
-                  "borrower_name": "Joe Doe", 
-                  "lender_id": "2", 
-                  "lender_name": "Jolana Brocwan", 
-                  "type_id": "1", 
-                  "value": "10.50",
-                  "refunded": null,
-                  "created": "2014-11-27T22:48:27Z"
-             } 
+                "id": 13,
+                "value": 23,
+                "status": 1,
+                "lender_id": 2,
+                "borrower_id": 3,
+                "debt_type_id": 1,
+                "accepted_at": "1999-01-01 10:10:10",
+                "rejected_at": "1999-01-01 10:10:10",
+                "created_at": "1999-01-01 10:10:10",
+                "updated_at": "1999-01-01 10:10:10",
+                "borrower_name": "user#1",
+                "lender_name": "user#2"
+                } 
              ]
             }
- 
-### Refund a dept [PUT]
-+ Request (application/json)
 
-        {
-        }
+### Remove a Dept [DELETE]
++ Request (application/json)
+    + Headers 
+
+            Authorization: 19f.3757754d6
+            
++ Response 200 (application/json)
+
+    + Body
+
+            { 
+            "status" : "success",
+            "isModified" : "true"
+            }
+            
+### Modify a dept [PATCH]
+
++ Request (application/json)
+    + Headers 
+
+            Authorization: 19f.3757754d6
+    + Body
+
+            {
+                "value": "10.50"
+            }    
 
 + Response 200 (application/json)           
 
             { 
             "status" : "success",
-            "users" : [ 
-                {
-                  "id": "1", 
-                  "borrower_id": "1", 
-                  "borrower_name": "Joe Doe", 
-                  "lender_id": "2", 
-                  "lender_name": "Jolana Brocwan", 
-                  "type_id": "1", 
-                  "value": "10.50",
-                  "refunded": "2014-11-27T23:48:27Z",
-                  "created": "2014-11-27T22:48:27Z"
-             } 
-             ]
+            "isModified" : "true"
+            }
+            
+## Dept acceptation [/depts/{id}/accept]
+### Accept a dept [PUT]
+Set debt to accepted, where borrower_id is userId
+
++ Request (application/json)
+    + Headers 
+
+            Authorization: 19f.3757754d6
+
++ Response 200 (application/json)           
+
+            { 
+            "status" : "success",
+            "isModified" : "true"
             }
 
+## Dept rejcetion [/depts/{id}/reject]
+### Reject a dept [PUT]
+Set debt to rejected, where borrower_id is userId
+
++ Request (application/json)
+    + Headers 
+
+            Authorization: 19f.3757754d6
+
++ Response 200 (application/json)           
+
+            { 
+            "status" : "success",
+            "isModified" : "true"
+            }
+            
 # Group Dept Types
 
 ## Types [/types]
 ### List all dept types [GET]
++ Request (application/json)
+    + Headers 
+
+            Authorization: 19f.3757754d6
+            
 + Response 200 (application/json)
 
         {
