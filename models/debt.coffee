@@ -141,6 +141,12 @@ getAll = (userId, filters, next) ->
       sub.where('borrower_id', filters.contractor)
       .orWhere('lender_id', filters.contractor)
 
+  # TODO: Find contractors by user.username too
+  if filters.contractor_name
+    query.where (sub) ->
+      sub.where('borrower_name', filters.contractor_name)
+      .orWhere('lender_name', filters.contractor_name)
+
   if filters.status?
     query.where('status', '=', filters.status)
 

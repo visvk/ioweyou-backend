@@ -48,8 +48,8 @@ filters = (req, res, next) ->
   if req.query.to
     req.assert('to', 'Invalid from date format. Expected POSIX time').isInt()
 
-  if req.query.contractor
-    req.assert('contractor', 'Invalid contractor format. Expected integer.').isInt()
+  if req.query.friend_id
+    req.assert('friend_id', 'Invalid friend_id format. Expected integer.').isInt()
 
   if req.query.status
     req.assert('status', 'Invalid status format. Expected integer.').isInt()
@@ -65,7 +65,8 @@ filters = (req, res, next) ->
       offset: req.query.offset
       from: Number(req.query.from)
       to: Number(req.query.to)
-      contractor: req.query.contractor
+      contractor: req.query.friend_id
+      contractor_name: req.query.contractor_name
       status: req.query.status
       order: req.query.order
       name: req.query.name
