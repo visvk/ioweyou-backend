@@ -23,7 +23,7 @@ getById = (req, res) ->
       res.status(404).send()
 
 getMyProfile = (req, res) ->
-  userId = res.locals.user.ioweyouId
+  userId = req.user.ioweyouId
 
   userTable.getById userId, (user) =>
     if user

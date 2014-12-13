@@ -12,16 +12,16 @@ emiter = require '../lib/eventEmiter'
 logger = require './../lib/logger'
 
 module.exports = (app) ->
-  app.get '/debts', auth.tokenAuth, filters, list
+  app.get '/debts', filters, list
 #  app.get '/debts/summary', auth.tokenAuth, filters, summary
-  app.get '/debts/count', auth.tokenAuth, filters, count
-  app.post '/debts',auth.tokenAuth, create
+  app.get '/debts/count', filters, count
+  app.post '/debts', create
 
-  app.get '/debts/:id', auth.tokenAuth, one
-  app.patch '/debts/:id', auth.tokenAuth, modify
-  app.post '/debts/:id/accept', auth.tokenAuth, accept
-  app.post '/debts/:id/reject', auth.tokenAuth, reject
-  app.delete '/debts/:id', auth.tokenAuth, remove
+  app.get '/debts/:id', one
+  app.patch '/debts/:id', modify
+  app.post '/debts/:id/accept', accept
+  app.post '/debts/:id/reject', reject
+  app.delete '/debts/:id', remove
 
 
 _formatResponse = (debts) ->
@@ -81,7 +81,7 @@ one = (req, res) ->
     return
 
   debtsId = req.params.id
-  userId = res.locals.user.ioweyouId
+  userId = req.user.ioweyouId
 
   debtsTable.getUserDebtById userId, debtsId, (error, debts) ->
     res.header "Content-Type", "application/json"
@@ -95,7 +95,7 @@ one = (req, res) ->
 
 
 list = (req, res) ->
-  userId = res.locals.user.ioweyouId
+  userId = req.user.ioweyouId
 
   debtsTable.getAll userId, res.locals.filters, (error, debts) ->
     res.header "Content-Type", "application/json"
@@ -109,7 +109,7 @@ list = (req, res) ->
 
 
 summary = (req, res) ->
-  userId = res.locals.user.ioweyouId
+  userId = req.user.ioweyouId
 
   debtsTable.getSummary userId, res.locals.filters, (error, summary) ->
     res.header "Content-Type", "application/json"
@@ -122,7 +122,7 @@ summary = (req, res) ->
 
 
 count = (req, res) ->
-  userId = res.locals.user.ioweyouId
+  userId = req.user.ioweyouId
 
   debtsTable.getCount userId, res.locals.filters, (error, count) ->
     res.header "Content-Type", "application/json"
@@ -159,7 +159,7 @@ create = (req, res) ->
     created_at: moment().format('YYYY-MM-DD HH:mm:ss')
     updated_at: moment().format('YYYY-MM-DD HH:mm:ss')
 
-  userId = res.locals.user.ioweyouId
+  userId = req.user.ioweyouId
   values.name = req.body.name
 
   if userId is req.body.borrower_id
@@ -204,7 +204,7 @@ accept = (req, res) ->
     return
 
   debtsId = req.params.id
-  userId = res.locals.user.ioweyouId
+  userId = req.user.ioweyouId
 
   debtsTable.accept userId, debtsId, (error, isModified) ->
     if error
@@ -221,7 +221,7 @@ reject = (req, res) ->
     return
 
   debtsId = req.params.id
-  userId = res.locals.user.ioweyouId
+  userId = req.user.ioweyouId
 
   debtsTable.reject userId, debtsId, (error, isModified) ->
     if error
@@ -238,7 +238,7 @@ remove = (req, res) ->
     return
 
   debtsId = req.params.id
-  userId = res.locals.user.ioweyouId
+  userId = req.user.ioweyouId
 
   debtsTable.remove userId, debtsId, (error, isModified) ->
     res.header "Content-Type", "application/json"
@@ -259,7 +259,7 @@ modify = (req, res) ->
     return
 
   debtsId = req.params.id
-  userId = res.locals.user.ioweyouId
+  userId = req.user.ioweyouId
   name = req.body.name
   value = req.body.value
 

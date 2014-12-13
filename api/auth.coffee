@@ -1,6 +1,7 @@
 uuid = require 'node-uuid'
 request = require 'request'
 bcrypt = require 'bcrypt'
+jwt = require 'jsonwebtoken'
 auth = require '../lib/auth'
 facebook = require '../lib/facebook'
 userTable = require '../models/user'
@@ -8,10 +9,12 @@ userTable = require '../models/user'
 userFriendshipTable = require '../models/userFriendship'
 #config = require '../config'
 db = require '../db'
-session = require '../models/session'
+#session = require '../models/session'
 moment = require 'moment'
 _ = require 'lodash'
 logger = require './../lib/logger'
+
+_secret = 'devSecret64x6x4'
 
 module.exports = (app) ->
   app.post '/login',
@@ -26,7 +29,7 @@ module.exports = (app) ->
     register
 
 prepareLocals = (req, res, next) ->
-  req.session = session
+#  req.session = session
   res.locals.existingUser = null
 
   next()
@@ -45,19 +48,17 @@ login = (req, res) ->
     if user and bcrypt.compareSync(req.body.password, user.password)
       loggedUser =
         username: user.username
-        first_name: ''
-        last_name: ''
-        email: ''
-        ioweyouToken: uuid.v4()
         ioweyouId: user.id.toString()
 
-      req.session.setUserData loggedUser.ioweyouToken, loggedUser
+      token = jwt.sign loggedUser, (process.env.secret or _secret)
+
+#      req.session.setUserData loggedUser.ioweyouToken, loggedUser
       res.header "Content-Type", "application/json"
       res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate')
       res.header('Expires', '-1')
       res.header('Pragma', 'no-cache')
       res.status 200
-      res.send access_token: loggedUser.ioweyouToken
+      res.send access_token: token
     else
       logger.warn "Bad request to get token (bad credentials) for user: #{req.body.username} from #{req.connection.remoteAddress} "
       res.header('WWW-Authenticate': 'Basic realm="email:password"')
@@ -85,19 +86,16 @@ register = (req, res, next) ->
 
       loggedUser =
         username: newUser.username
-        first_name: newUser.first_name
-        last_name: newUser.last_name
-        email: newUser.email
-        ioweyouToken: uuid.v4()
         ioweyouId: response[0].toString()
 
-      req.session.setUserData loggedUser.ioweyouToken, loggedUser
+      token = jwt.sign loggedUser, (process.env.secret or _secret)
+#      req.session.setUserData loggedUser.ioweyouToken, loggedUser
       res.header "Content-Type", "application/json"
       res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate')
       res.header('Expires', '-1')
       res.header('Pragma', 'no-cache')
       res.status 200
-      res.send access_token: loggedUser.ioweyouToken
+      res.send access_token: token
     else
       res.status(500).send(error)
 

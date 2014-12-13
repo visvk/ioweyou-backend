@@ -30,9 +30,10 @@ describe 'api/auth', ->
   it "should return code 401, when POST \"/login\" route with bad credentials", (done)->
     request(url)
       .post('/login')
-      .send({ username: "bafd", password: "login"})
+      .send({ username: "asd", password: "bad"})
       .expect(401)
       .end (err,res) ->
+#        console.log res.body
         if err then throw err
         done()
 
@@ -43,5 +44,6 @@ describe 'api/auth', ->
       .send({ username: "", password: ""})
       .expect(400)
       .end (err,res) ->
+#        console.log res.body
         if err then throw err
         done()

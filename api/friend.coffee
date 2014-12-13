@@ -1,11 +1,11 @@
 #config = require '../config'
-auth = require '../lib/auth'
+#auth = require '../lib/auth'
 userTable = require '../models/user'
 userFriendshipTable = require '../models/userFriendship'
 
 module.exports = (app) ->
-  app.get '/friends', auth.tokenAuth, getFriends
-  app.post '/friends', auth.tokenAuth, addFriend
+  app.get '/friends', getFriends
+  app.post '/friends', addFriend
 
 
 _formatResponse = (friends) ->
@@ -15,7 +15,7 @@ _formatResponse = (friends) ->
 
 
 getFriends = (req, res) ->
-  userId = res.locals.user.ioweyouId
+  userId = req.user.ioweyouId
 
   userTable.getFriends userId, (friends) =>
     if friends
@@ -25,7 +25,7 @@ getFriends = (req, res) ->
       res.status(404).send()
 
 addFriend = (req, res) ->
-  userId = res.locals.user.ioweyouId
+  userId = req.user.ioweyouId
 
   friendId = req.body.user_id
 

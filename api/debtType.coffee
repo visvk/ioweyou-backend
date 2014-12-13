@@ -1,9 +1,9 @@
 #config = require '../config'
-auth = require '../lib/auth'
+#auth = require '../lib/auth'
 debtTypeTable = require '../models/user'
 
 module.exports = (app) ->
-  app.get '/types', auth.tokenAuth, list
+  app.get '/types', list
 
 
 _formatResponse = (types) ->

@@ -6,6 +6,9 @@ bodyParser = require 'body-parser'
 morgan = require 'morgan'
 validator = require './lib/validator'
 logger = require './lib/logger'
+jwt = require 'express-jwt'
+
+_secret = 'devSecret64x6x4'
 
 app = exports.app = express()
 app.set('title', 'I Owe YOU!')
@@ -25,6 +28,8 @@ app.use (req, res, next) ->
 app.use expressValidator({
   errorFormatter: validator.errorFormatter
 })
+app.use jwt({ secret: process.env.secret or _secret}).unless( path: ['/login', '/register'])
+
 #mailer.extend app, config.mailer
 
 #Controllers
