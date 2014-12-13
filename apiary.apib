@@ -170,12 +170,10 @@ A single User object with all its details
         
 # Group Depts
 Debt status: 0 - Open, 1 - Accepted, 2 - rejected
-## Depts [/depts{?borrower_id,borrower_name,lender_id,lender_name,type_id,status,limit,offset}]
+## Depts [/depts{?friend_id,friend_name,type_id,status,limit,offset}]
 + Parameters
-    + borrower_id (optional, int, `1`) ... get depts by borrower_id
-    + borrower_name (optional, string, `Joe Doe`) ... get depts by borrower_name
-    + lender_id (optional, int, `2`) ... get depts by lender_id
-    + lender_name (optional, string, `Jolana Brocwan`) ... get depts by lender_name
+    + friend_id (optional, int, `1`) ... get depts by borrower_id
+    + friend_name (optional, string, `Joe Doe`) ... get depts by borrower_name
     + type_id (optional, int, `1`) ... get depts by type_id
     + status (optional, boolean, `0`) ... get depts by status
     + limit (optional, int, `10`) ... **default**: 10
