@@ -1,7 +1,7 @@
 express = require 'express'
 request = require 'request'
 session = require '../models/session'
-config = require '../config'
+#config = require '../config'
 
 module.exports =
   errorFormatter: (param, message, value) ->

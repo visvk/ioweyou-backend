@@ -1,8 +1,5 @@
 express = require 'express'
-request = require 'request'
 session = require '../models/session'
-config = require '../config'
-logger = require './../lib/logger'
 
 module.exports =
   tokenAuth: (req, res, next) ->

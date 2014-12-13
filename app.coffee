@@ -1,5 +1,5 @@
 express = require 'express'
-config = require './config'
+#config = require './config'
 expressValidator = require 'express-validator'
 mailer = require 'express-mailer'
 bodyParser = require 'body-parser'
@@ -25,7 +25,7 @@ app.use (req, res, next) ->
 app.use expressValidator({
   errorFormatter: validator.errorFormatter
 })
-mailer.extend app, config.mailer
+#mailer.extend app, config.mailer
 
 #Controllers
 require('./api/debt')(app)

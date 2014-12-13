@@ -1,5 +1,5 @@
 moment = require 'moment'
-config = require '../config'
+#config = require '../config'
 auth = require '../lib/auth'
 debtsTable = require '../models/debt'
 userTable = require '../models/user'

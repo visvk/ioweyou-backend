@@ -1,4 +1,4 @@
-config = require '../config'
+#config = require '../config'
 auth = require '../lib/auth'
 debtTypeTable = require '../models/user'
 

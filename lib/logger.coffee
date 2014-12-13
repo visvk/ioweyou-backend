@@ -1,11 +1,11 @@
 winston = require 'winston'
-config = require '../config'
+#config = require '../config'
 
 winston.emitErrs = true
 logger = new winston.Logger(
   transports: [
     new winston.transports.File(
-      level: config.logger.console_log_level
+      level: "WARN"
       filename: "./logs/all-logs.log"
       handleExceptions: true
       json: true
