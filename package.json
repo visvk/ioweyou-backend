@@ -6,6 +6,9 @@
   "engines": {
     "node": "0.10.x"
   },
+  "scripts": {
+    "syncDB": "./node_modules/grunt-cli/bin/grunt migration:syncdb"
+  },
   "dependencies": {
     "apnagent": "*",
     "async": "^0.2.5",

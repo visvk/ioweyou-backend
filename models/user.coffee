@@ -13,9 +13,27 @@ module.exports =
 #    getByFacebookId(value, next)
   getFriends: (userId, next) ->
     getFriends(userId, next)
+  getAll: (filters, next) ->
+    getAll(filters, next)
 #  findAllByFacebookIds: (facebookIds, next) ->
 #    findAllByFacebookIds(facebookIds, next)
 
+
+getAll = (filters, next) ->
+  query = db.postgres()
+  .from('user')
+  .select(
+    'user.id',
+    'user.username'
+  )
+  .limit(filters.limit or 8)
+  .offset(filters.offset or 0)
+
+  if filters.username
+    query.where('username', 'ilike', '%'+filters.username+'%')
+
+  query.exec (error, reply) ->
+    next(error, reply)
 
 create = (fields, next) ->
   db.postgres('user')
