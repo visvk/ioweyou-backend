@@ -19,7 +19,7 @@ describe 'model/debt', ()->
     server.close()
     done()
 
-  describe 'getById', ()->
+  describe 'Debt getById', ()->
 
     beforeEach (done)->
       clearDatabase.exec (error, result) ->
@@ -38,7 +38,7 @@ describe 'model/debt', ()->
         done()
 
     it "should return undefined, if debt exists but is deleted", (done)->
-      debtTable.getById 3, (error, debt)->
+      debtTable.getById 5, (error, debt)->
         expect(debt).to.be.undefined
         done()
 #
@@ -89,6 +89,14 @@ describe 'model/debt', ()->
     it "should return 1 debt, if to is equal \"1999-01-01 00:00:00\"", (done)->
       filters =
         to: moment("1999-01-01 00:00:00").valueOf()
+
+      debtTable.getAll 1, filters, (error, debts)->
+        expect(debts.length).to.eql(1)
+        done()
+
+    it "should return 1 debt, if contractor_name is  \"Peter\"", (done)->
+      filters =
+        contractor_name: "Peter"
 
       debtTable.getAll 1, filters, (error, debts)->
         expect(debts.length).to.eql(1)
